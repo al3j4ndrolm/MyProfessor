@@ -1,6 +1,7 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.android.application)  // Android application plugin from version catalog
+    alias(libs.plugins.jetbrains.kotlin.android)  // Kotlin plugin from version catalog
+    alias(libs.plugins.chaquopy) // This should work after adding the repository
 }
 
 android {
@@ -17,6 +18,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+
+        ndk {
+            abiFilters += setOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
     }
 
@@ -49,8 +54,23 @@ android {
     }
 }
 
+
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven(url = "https://chaquo.com/maven")
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.0.0")
+        classpath("com.chaquo.python:gradle:15.0.1")
+    }
+}
+
 dependencies {
-    implementation("com.google.code.gson:gson:2.8.9")
+    implementation("io.coil-kt:coil-compose:2.4.0") // Coil for Compose
+    implementation("io.coil-kt:coil-gif:2.4.0") // GIF support in Coil
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -59,6 +79,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
