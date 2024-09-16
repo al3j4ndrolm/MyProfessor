@@ -9,12 +9,12 @@ def get_professors_data(department_code, coruse_code, term_code):
 	table = soup.find_all('table', 'table table-schedule table-hover mix-container')[0]
 	rows = table.find_all('tr')
 
-	professor_table = read_row_and_update_intructor_table(rows, department_code + " " + coruse_code)
+	professor_table = get_professor_table(rows, department_code + " " + coruse_code)
 
 	return list(professor_table.values())
 
 
-def read_row_and_update_intructor_table(rows, full_coruse_code):
+def get_professor_table(rows, full_coruse_code):
 	professor_table = {}
 
 	for row in rows:
@@ -50,12 +50,7 @@ def convert_name(name):
 	return formatted_name
 
 def get_days(input):
-	result = ""
-
-	for day in input:
-		if day != "·":
-			result += day
-	return input.strip("·")
+	return input.replace("·", "")
 
 if __name__ == "__main__":
 	print(get_professors_data(department_code = "MATH", coruse_code = "1A", term_code = "F2024"))
