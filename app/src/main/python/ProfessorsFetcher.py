@@ -9,12 +9,12 @@ def get_professors_data(department_code, coruse_code, term_code):
 	table = soup.find_all('table', 'table table-schedule table-hover mix-container')[0]
 	rows = table.find_all('tr')
 
-	professor_table = get_professor_table(rows, department_code + " " + coruse_code)
+	professor_table = build_professor_table(rows, department_code + " " + coruse_code)
 
 	return list(professor_table.values())
 
 
-def get_professor_table(rows, full_coruse_code):
+def build_professor_table(rows, full_coruse_code):
 	professor_table = {}
 
 	for row in rows:
