@@ -49,9 +49,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
-import com.chaquo.python.PyObject
-import com.chaquo.python.Python
-import com.chaquo.python.android.AndroidPlatform
+import java.time.LocalDate
 
 class MainScreen {
 
@@ -107,6 +105,9 @@ class MainScreen {
         var className by remember { mutableStateOf("") }
         var showSearchResult by remember { mutableStateOf(false)
         }
+        val currentDate = LocalDate.now()
+        val (currentTerm, nextTerm) = getCurrentAndNextTerm(currentDate)
+        var choosenTerm by remember { mutableStateOf("testing") }
 
 
         Box(
@@ -168,13 +169,24 @@ class MainScreen {
                             showSearchResult = true
                         })
                     }
+                    termButtons(
+                        currentTerm = currentTerm,
+                        nextTerm = nextTerm,
+                        onClickCurrentTerm = {
+                            choosenTerm = currentTerm
+                        },
+                        onClickNextTerm = {
+                            choosenTerm = nextTerm
+                        }
+                    )
                 }
             }
 
 
             if (showSearchResult) {
                 val (department, code) = parseCourseInfo(className)
-                val professors = searchProfessors(department.uppercase(), code.uppercase(), "F2024", context)
+//                val professors = searchProfessors(department.uppercase(), code.uppercase(), "F2024", context)
+                val professors = listOf(Professor())
 
                 if (professors.isEmpty()) {
                     Box(
@@ -204,10 +216,9 @@ class MainScreen {
                             .padding(top = 60.dp),
                     ) {
                         Column {
-                            professorDisplayUI.searchResultHeader("MATH 1A", "Fall 2024")
+                            professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}", "$choosenTerm ${currentDate.year}")
                             Text(text = String.format("latency: %s seconds", (endTime - startTime).toDouble()/1000.0),
                                 fontSize = 10.sp)
-//                            Text(text = "the sum result is ${sum}")
 
                             Column(modifier = Modifier
                                 .fillMaxWidth()
@@ -265,5 +276,45 @@ class MainScreen {
         Button(onClick = onClick) {
             Text("Back")
         }
+    }
+
+    fun getCurrentAndNextTerm(date: LocalDate): Pair<String, String> {
+        val year = date.year
+
+        val fallStart = LocalDate.of(year, 9, 25)
+        val winterStart = LocalDate.of(year, 1, 8)
+        val springStart = LocalDate.of(year, 4, 8)
+        val summerStart = LocalDate.of(year, 7, 1)
+
+        return when {
+            date.isAfter(fallStart.minusDays(1)) || date.isBefore(winterStart) -> "Fall" to "Winter"
+            date.isAfter(winterStart.minusDays(1)) && date.isBefore(springStart) -> "Winter" to "Spring"
+            date.isAfter(springStart.minusDays(1)) && date.isBefore(summerStart) -> "Spring" to "Summer"
+            date.isAfter(summerStart.minusDays(1)) && date.isBefore(fallStart) -> "Summer" to "Fall"
+            else -> "Unknown Term" to "Unknown Term"
+        }
+    }
+
+    @Composable
+    fun termButtons(onClickCurrentTerm: () -> Unit, onClickNextTerm: () -> Unit, currentTerm: String, nextTerm: String){
+
+        Row {
+            Button(onClick = { onClickCurrentTerm() }) {
+                Text(text = currentTerm)
+            }
+            Button(onClick = { onClickNextTerm() }) {
+                Text(text = nextTerm)
+            }
+        }
+    }
+    fun getTerm(term: String): String {
+        val currentYear = LocalDate.now().year
+        val termMap = mapOf(
+            "Spring" to "",
+            "Summer" to "M",
+            "Fall" to "F",
+            "Winter" to "W"
+        )
+        return termMap[term] + currentYear.toString()
     }
 }
