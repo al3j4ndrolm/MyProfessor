@@ -2,11 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 from dataclasses import asdict
 
-def get_soup(url):
-	url_to_fetch_courses = 'https://www.deanza.edu/schedule/'
-	page = requests.get(url_to_fetch_courses)
-	return BeautifulSoup(page.text, 'html.parser')
-
 def get_terms():
 	soup = get_soup(url = 'https://www.deanza.edu/schedule/')
 	sections = soup.find_all('fieldset')
@@ -30,9 +25,11 @@ def get_professors_data(department_code, coruse_code, term_code):
 	rows = table.find_all('tr')
 
 	professor_table = build_professor_table(rows, department_code + " " + coruse_code)
-
 	return list(professor_table.values())
 
+def get_soup(url):
+	page = requests.get(url)
+	return BeautifulSoup(page.text, 'html.parser')
 
 def build_professor_table(rows, full_coruse_code):
 	professor_table = {}
@@ -74,5 +71,4 @@ def get_days(input):
 
 if __name__ == "__main__":
 	# print(get_professors_data(department_code = "MATH", coruse_code = "1A", term_code = "F2024"))
-
 	print(get_terms())
