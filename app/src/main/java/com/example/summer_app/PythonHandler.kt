@@ -6,7 +6,7 @@ import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 
 fun callPythonGetProfessorsData(context: Context, department: String, courseCode:String, term: String): PyObject {
-    val pyScript = getPythonScript(context=context, scriptName = "test")
+    val pyScript = getPythonScript(context=context, scriptName = "ProfessorsFetcher")
 
     // Call the function from the Python script
     return pyScript.callAttr("get_professors_data", department, courseCode, term)
