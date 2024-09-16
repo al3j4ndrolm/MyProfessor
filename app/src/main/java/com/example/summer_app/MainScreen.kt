@@ -185,8 +185,8 @@ class MainScreen {
 
             if (showSearchResult) {
                 val (department, code) = parseCourseInfo(className)
-//                val professors = searchProfessors(department.uppercase(), code.uppercase(), "F2024", context)
-                val professors = listOf(Professor())
+                val professors = searchProfessors(department.uppercase(), code.uppercase(), "F2024", context)
+//                val professors = listOf(Professor())
 
                 if (professors.isEmpty()) {
                     Box(
