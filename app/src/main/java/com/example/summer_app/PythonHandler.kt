@@ -12,6 +12,13 @@ fun callPythonGetProfessorsData(context: Context, department: String, courseCode
     return pyScript.callAttr("get_professors_data", department, courseCode, term)
 }
 
+fun fetchAvailableTerms(context: Context): PyObject {
+    val pyScript = getPythonScript(context=context, scriptName = "ProfessorsFetcher")
+
+    // Call the function from the Python script
+    return pyScript.callAttr("get_terms")
+}
+
 fun getPythonScript(context: Context, scriptName:String) : PyObject {
     if (!Python.isStarted()) {
         Python.start(AndroidPlatform(context))
