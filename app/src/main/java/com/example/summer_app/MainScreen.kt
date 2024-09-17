@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -103,12 +104,11 @@ class MainScreen {
     fun SearchScreen(context: Context) {
         var startTime by remember { mutableLongStateOf(0L) }
         var className by remember { mutableStateOf("") }
-        var showSearchResult by remember { mutableStateOf(false)
-        }
-        val currentDate = LocalDate.now()
-        val (currentTerm, nextTerm) = getCurrentAndNextTerm(currentDate)
-        var choosenTerm by remember { mutableStateOf("testing") }
-
+        var showSearchResult by remember { mutableStateOf(false) }
+        var choosenTerm by remember { mutableStateOf("unknown") }
+        var terms = getTerms(context)
+        var choosenTermCode by remember { mutableStateOf("") }
+        var isSelected by remember { mutableStateOf(false) }
 
         Box(
             modifier = Modifier
@@ -166,26 +166,36 @@ class MainScreen {
                         SearchButton(onClick = {
                             startTime = System.currentTimeMillis()
                             focusManager.clearFocus()
-                            showSearchResult = true
-                        })
+                            if (isSelected){
+                                showSearchResult = true
+                            }
+                             },
+                            isPressed = isSelected
+                        )
                     }
-                    termButtons(
-                        currentTerm = currentTerm,
-                        nextTerm = nextTerm,
-                        onClickCurrentTerm = {
-                            choosenTerm = currentTerm
-                        },
-                        onClickNextTerm = {
-                            choosenTerm = nextTerm
+
+                    Row {
+                        if (terms.first.isNotEmpty()){
+                            termButtons(onTerm = {
+                                choosenTerm = terms.first[0]
+                                choosenTermCode = terms.second[0]
+                                isSelected = true
+                            }, terms.first[0])
+                            termButtons(onTerm = {
+                                choosenTerm = terms.first[1]
+                                choosenTermCode = terms.second[1]
+                                isSelected = true
+                            }, terms.first[1])
+                        } else {
+                            Text(text = "Fetching terms...")
                         }
-                    )
+                    }
                 }
             }
 
-
             if (showSearchResult) {
                 val (department, code) = parseCourseInfo(className)
-                val professors = searchProfessors(department.uppercase(), code.uppercase(), "F2024", context)
+                val professors = searchProfessors(department.uppercase(), code.uppercase(), choosenTermCode.toString(), context)
 //                val professors = listOf(Professor())
 
                 if (professors.isEmpty()) {
@@ -216,7 +226,7 @@ class MainScreen {
                             .padding(top = 60.dp),
                     ) {
                         Column {
-                            professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}", "$choosenTerm ${currentDate.year}")
+                            professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}", "$choosenTerm")
                             Text(text = String.format("latency: %s seconds", (endTime - startTime).toDouble()/1000.0),
                                 fontSize = 10.sp)
 
@@ -247,7 +257,15 @@ class MainScreen {
     }
 
     @Composable
-    fun SearchButton(onClick: () -> Unit) {
+    fun SearchButton(onClick: () -> Unit, isPressed: Boolean) {
+        val unPressedColor = Color(0xFF969696)
+        val pressedColor = Color.DarkGray
+        var statusColor = unPressedColor
+
+        if (isPressed) {
+            statusColor = pressedColor
+        }
+
         Button(
             onClick = onClick,
             modifier = Modifier.size(56.dp),
@@ -266,7 +284,8 @@ class MainScreen {
                     R.drawable.search_24dp_434343_fill0_wght400_grad0_opsz24
                 ),
                 "search",
-                modifier = Modifier.size(35.dp)
+                modifier = Modifier.size(35.dp),
+                colorFilter = ColorFilter.tint(statusColor)
             )
         }
     }
@@ -278,43 +297,11 @@ class MainScreen {
         }
     }
 
-    fun getCurrentAndNextTerm(date: LocalDate): Pair<String, String> {
-        val year = date.year
-
-        val fallStart = LocalDate.of(year, 9, 25)
-        val winterStart = LocalDate.of(year, 1, 8)
-        val springStart = LocalDate.of(year, 4, 8)
-        val summerStart = LocalDate.of(year, 7, 1)
-
-        return when {
-            date.isAfter(fallStart.minusDays(1)) || date.isBefore(winterStart) -> "Fall" to "Winter"
-            date.isAfter(winterStart.minusDays(1)) && date.isBefore(springStart) -> "Winter" to "Spring"
-            date.isAfter(springStart.minusDays(1)) && date.isBefore(summerStart) -> "Spring" to "Summer"
-            date.isAfter(summerStart.minusDays(1)) && date.isBefore(fallStart) -> "Summer" to "Fall"
-            else -> "Unknown Term" to "Unknown Term"
-        }
-    }
-
     @Composable
-    fun termButtons(onClickCurrentTerm: () -> Unit, onClickNextTerm: () -> Unit, currentTerm: String, nextTerm: String){
+    fun termButtons(onTerm: () -> Unit, term: String){
 
-        Row {
-            Button(onClick = { onClickCurrentTerm() }) {
-                Text(text = currentTerm)
-            }
-            Button(onClick = { onClickNextTerm() }) {
-                Text(text = nextTerm)
-            }
+        Button(onClick = { onTerm() }) {
+            Text(text = term)
         }
-    }
-    fun getTerm(term: String): String {
-        val currentYear = LocalDate.now().year
-        val termMap = mapOf(
-            "Spring" to "",
-            "Summer" to "M",
-            "Fall" to "F",
-            "Winter" to "W"
-        )
-        return termMap[term] + currentYear.toString()
     }
 }

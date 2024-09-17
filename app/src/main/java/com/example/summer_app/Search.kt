@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.chaquo.python.PyObject
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -39,5 +40,45 @@ suspend fun loadProfessorListFromPyObject(professorsData: PyObject): List<Profes
             professorsList.add(gson.fromJson(professorData.toString(), Professor::class.java))
         }
         return@withContext professorsList
+    }
+}
+
+@Composable
+fun getTerms(context: Context): Pair<List<String>, List<String>> {
+    var terms by remember { mutableStateOf<List<String>>(emptyList()) }
+    var code by remember { mutableStateOf<List<String>>(emptyList()) }
+
+
+
+    LaunchedEffect(Unit) {
+        val result: PyObject = fetchAvailableTerms(context)
+        val (termTextList, termCodeList) = loadTermListFromPyObject(result)
+        terms = termTextList
+        code = termCodeList
+    }
+
+    return terms to code
+}
+
+suspend fun loadTermListFromPyObject(termsData: PyObject): Pair<List<String>, List<String>> {
+    return withContext(Dispatchers.IO) {
+        val gson = Gson()
+        val termsList = mutableListOf<String>()
+        val termsCodeList = mutableListOf<String>()
+
+        // Iterate through the list of term objects
+        for (termData in termsData.asList()) {
+            // Parse termData as a JSON object
+            val jsonObject = gson.fromJson(termData.toString(), JsonObject::class.java)
+
+            // Extract the "term_text" field (or "term_code" if needed)
+            val termText = jsonObject.get("term_text").asString
+            termsList.add(termText)  // Add the term text to the list
+
+            val termCode = jsonObject.get("term_code").asString
+            termsCodeList.add(termCode)
+
+        }
+        return@withContext Pair(termsList, termsCodeList)
     }
 }
