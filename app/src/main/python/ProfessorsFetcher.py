@@ -1,9 +1,9 @@
-import requests
-from bs4 import BeautifulSoup
-from dataclasses import asdict
+import HttpUtil
+
+######################## Exported to be used in kotlin ########################
 
 def get_terms():
-	soup = get_soup(url = 'https://www.deanza.edu/schedule/')
+	soup = HttpUtil.get_soup(url = 'https://www.deanza.edu/schedule/')
 	sections = soup.find_all('fieldset')
 	if len(sections) == 0:
 		return []
@@ -20,16 +20,14 @@ def get_terms():
 	return terms
 
 def get_professors_data(department_code, coruse_code, term_code):
-	soup = get_soup(url = f'https://www.deanza.edu/schedule/listings.html?dept={department_code}&t={term_code}')
+	soup = HttpUtil.get_soup(url = f'https://www.deanza.edu/schedule/listings.html?dept={department_code}&t={term_code}')
 	table = soup.find_all('table', 'table table-schedule table-hover mix-container')[0]
 	rows = table.find_all('tr')
 
 	professor_table = build_professor_table(rows, department_code + " " + coruse_code)
 	return list(professor_table.values())
 
-def get_soup(url):
-	page = requests.get(url)
-	return BeautifulSoup(page.text, 'html.parser')
+######################## Exported to be used in kotlin ########################
 
 def build_professor_table(rows, full_coruse_code):
 	professor_table = {}
