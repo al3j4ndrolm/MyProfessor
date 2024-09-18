@@ -1,5 +1,7 @@
 package com.example.summer_app
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -96,6 +98,7 @@ class ProfessorDisplayUI {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun professorInformationDisplay(professor: Professor) {
         Box(
