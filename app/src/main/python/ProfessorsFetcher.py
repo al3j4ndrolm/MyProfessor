@@ -1,9 +1,10 @@
-import requests
-from bs4 import BeautifulSoup
-from dataclasses import asdict
+import HttpUtil
+
+######################## Exported to be used in kotlin ########################
 
 def get_terms():
-	soup = get_soup(url = 'https://www.deanza.edu/schedule/')
+	print(f"ProfessorsFetcher: Received call get_terms().")
+	soup = HttpUtil.get_soup(url = 'https://www.deanza.edu/schedule/')
 	sections = soup.find_all('fieldset')
 	if len(sections) == 0:
 		return []
@@ -17,19 +18,20 @@ def get_terms():
 				"term_text":button.text,
 				})
 
+	print(f"ProfessorsFetcher: Returning term data of get_terms() to client.")
 	return terms
 
 def get_professors_data(department_code, coruse_code, term_code):
-	soup = get_soup(url = f'https://www.deanza.edu/schedule/listings.html?dept={department_code}&t={term_code}')
+	print(f"ProfessorsFetcher: Received call get_professors_data({department_code}, {coruse_code}, {term_code}).")
+	soup = HttpUtil.get_soup(url = f'https://www.deanza.edu/schedule/listings.html?dept={department_code}&t={term_code}')
 	table = soup.find_all('table', 'table table-schedule table-hover mix-container')[0]
 	rows = table.find_all('tr')
 
 	professor_table = build_professor_table(rows, department_code + " " + coruse_code)
+	print(f"ProfessorsFetcher: Returning professor data of get_professors_data(...) to client.")
 	return list(professor_table.values())
 
-def get_soup(url):
-	page = requests.get(url)
-	return BeautifulSoup(page.text, 'html.parser')
+######################## Exported to be used in kotlin ########################
 
 def build_professor_table(rows, full_coruse_code):
 	professor_table = {}
@@ -78,7 +80,10 @@ def build_schedules(rows, start_row_i):
 	return schedules
 
 def build_schedule(columns, days_col, hours_col, location_col):
-	schedule = f"{get_days(columns[days_col].text)} - {columns[hours_col].text}/{columns[location_col].text}"
+	days_in_week = get_days(columns[days_col].text)
+	hours = columns[hours_col].text
+	location = columns[location_col].text
+	schedule = f"{days_in_week} - {hours}/{location}"
 	if not "TBA" in schedule:
 		return schedule
 	else:
