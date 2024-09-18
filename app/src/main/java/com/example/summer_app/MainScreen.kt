@@ -39,18 +39,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.decode.ImageDecoderDecoder
-import coil.request.ImageRequest
-import java.time.LocalDate
 
 class MainScreen {
 
@@ -108,7 +104,8 @@ class MainScreen {
         var choosenTerm by remember { mutableStateOf("unknown") }
         var terms = getTerms(context)
         var choosenTermCode by remember { mutableStateOf("") }
-        var isSelected by remember { mutableStateOf(false) }
+        var isFirstTermSelected by remember { mutableStateOf(false) }
+        var isSecondTermSelected by remember { mutableStateOf(false) }
 
         Box(
             modifier = Modifier
@@ -166,11 +163,11 @@ class MainScreen {
                         SearchButton(onClick = {
                             startTime = System.currentTimeMillis()
                             focusManager.clearFocus()
-                            if (isSelected){
+                            if (isFirstTermSelected || isSecondTermSelected){
                                 showSearchResult = true
                             }
                              },
-                            isPressed = isSelected
+                            isPressed = isFirstTermSelected || isSecondTermSelected
                         )
                     }
 
@@ -179,13 +176,18 @@ class MainScreen {
                             termButtons(onTerm = {
                                 choosenTerm = terms.first[0]
                                 choosenTermCode = terms.second[0]
-                                isSelected = true
-                            }, terms.first[0])
+                                isFirstTermSelected = true
+                                isSecondTermSelected = false
+                            }, terms.first[0],
+                                status = isFirstTermSelected
+                                )
                             termButtons(onTerm = {
                                 choosenTerm = terms.first[1]
                                 choosenTermCode = terms.second[1]
-                                isSelected = true
-                            }, terms.first[1])
+                                isSecondTermSelected = true
+                                isFirstTermSelected = false
+                            }, terms.first[1]
+                                , status = isSecondTermSelected)
                         } else {
                             Text(text = "Fetching terms...")
                         }
@@ -194,27 +196,35 @@ class MainScreen {
             }
 
             if (showSearchResult) {
-                val (department, code) = parseCourseInfo(className)
+                val (department, code) = parseCourseInfo(className.trimEnd())
                 val professors = searchProfessors(department.uppercase(), code.uppercase(), choosenTermCode.toString(), context)
-//                val professors = listOf(Professor())
 
                 if (professors.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.White),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(context = LocalContext.current)
-                                .data(R.drawable.searching)
-                                .decoderFactory { result, options, _ ->
-                                    ImageDecoderDecoder(result.source, options)
+                    Column {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .fillMaxHeight()
+                                .background(Color.White)
+                                .padding(top = 60.dp),
+                        ) {
+                            Column {
+                                professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}", "$choosenTerm")
+                                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Image(
+                                            modifier = Modifier
+                                                .size(100.dp),
+                                            colorFilter = ColorFilter.tint(Color.LightGray),
+                                            painter = painterResource(R.drawable.person_search_24px),
+                                            contentDescription = "Search professor")
+                                        Text("Searching for professors...", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.LightGray)
+                                    }
                                 }
-                                .build(),
-                            contentDescription = "Loading GIF"
-                        )
+                            }
+                        }
                     }
+
                 } else {
                     val endTime = System.currentTimeMillis()
 
@@ -226,7 +236,8 @@ class MainScreen {
                             .padding(top = 60.dp),
                     ) {
                         Column {
-                            professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}", "$choosenTerm")
+                            professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}", "$choosenTerm", onClick = {showSearchResult = false
+                                className = ""})
                             Text(text = String.format("latency: %s seconds", (endTime - startTime).toDouble()/1000.0),
                                 fontSize = 10.sp)
 
@@ -237,10 +248,6 @@ class MainScreen {
                                 for (professor in professors) {
                                     professorDisplayUI.professorInformationDisplay(professor)
                                 }
-                                BackSearchResultButton(onClick = {
-                                    showSearchResult = false
-                                    className = ""
-                                })
                             }
                         }
                     }
@@ -290,17 +297,18 @@ class MainScreen {
         }
     }
 
+
+
     @Composable
-    fun BackSearchResultButton(onClick: () -> Unit) {
-        Button(onClick = onClick) {
-            Text("Back")
+    fun termButtons(onTerm: () -> Unit, term: String, status: Boolean){
+
+        var isClickedColor = Color.LightGray
+
+        if (status){
+            isClickedColor = Color.DarkGray
         }
-    }
 
-    @Composable
-    fun termButtons(onTerm: () -> Unit, term: String){
-
-        Button(onClick = { onTerm() }) {
+        Button(onClick = { onTerm() }, colors = ButtonDefaults.buttonColors(isClickedColor)) {
             Text(text = term)
         }
     }

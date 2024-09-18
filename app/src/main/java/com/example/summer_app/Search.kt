@@ -17,7 +17,6 @@ import kotlinx.coroutines.withContext
 fun searchProfessors(department: String , courseCode: String, term: String, context:Context): List<Professor> {
 
     var professors by remember { mutableStateOf<List<Professor>>(emptyList()) }
-    // Launch a coroutine to fetch data when the composable first loads
     LaunchedEffect(Unit) {
         val result: PyObject = callPythonGetProfessorsData(
             context = context,
@@ -66,12 +65,9 @@ suspend fun loadTermListFromPyObject(termsData: PyObject): Pair<List<String>, Li
         val termsList = mutableListOf<String>()
         val termsCodeList = mutableListOf<String>()
 
-        // Iterate through the list of term objects
         for (termData in termsData.asList()) {
-            // Parse termData as a JSON object
             val jsonObject = gson.fromJson(termData.toString(), JsonObject::class.java)
 
-            // Extract the "term_text" field (or "term_code" if needed)
             val termText = jsonObject.get("term_text").asString
             termsList.add(termText)  // Add the term text to the list
 
