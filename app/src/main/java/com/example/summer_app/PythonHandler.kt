@@ -19,6 +19,11 @@ fun fetchAvailableTerms(context: Context): PyObject {
     return pyScript.callAttr("get_terms")
 }
 
+fun fetchProfessorRatings(context: Context, professorName: String): PyObject {
+    val pyScript = getPythonScript(context=context, scriptName = "RatingsFetcher")
+    return pyScript.callAttr("get_ratings", professorName)
+}
+
 fun getPythonScript(context: Context, scriptName:String) : PyObject {
     if (!Python.isStarted()) {
         Python.start(AndroidPlatform(context))

@@ -101,6 +101,9 @@ class ProfessorDisplayUI {
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun professorInformationDisplay(professor: Professor) {
+
+        professor.ratingData = fetchRatings(professor.name, LocalContext.current)
+
         Box(
             modifier = Modifier
                 .padding(start = 10.dp, end = 8.dp, top = 5.dp, bottom = 8.dp)
@@ -133,7 +136,7 @@ class ProfessorDisplayUI {
                                             fontWeight = FontWeight.Bold
                                         )
                                     ) {
-                                        append("${professor.num_ratings} reviews")
+                                        append("${professor.ratingData.review_num} reviews")
                                     }
                                 },
                                 textAlign = TextAlign.Start
@@ -168,10 +171,9 @@ class ProfessorDisplayUI {
                                 }
                             }
                             Divider(Color.Black, startText = "Ratings")
-
                             Column {
 
-                                if (professor.num_ratings > 0 or professor.num_ratings) {
+                                if (professor.ratingData.review_num > 0) {
                                     ratingDisplay("Difficulty", professor.difficulty, false, true)
                                     ratingDisplay(
                                         "Would take again",
@@ -208,7 +210,6 @@ class ProfessorDisplayUI {
             }
         }
     }
-
     @Composable
     fun BackSearchResultButton(onClick: () -> Unit) {
         Image(
