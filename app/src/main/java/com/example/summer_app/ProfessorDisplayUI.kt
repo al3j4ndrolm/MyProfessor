@@ -154,7 +154,7 @@ class ProfessorDisplayUI {
                                 textAlign = TextAlign.Start
                             )
 
-                            Divider(Color.Black, startText = "Schedules")
+                            Divider(Color.Black, startText = "Schedules", isClickable = true, onClick = {showSchedule = !showSchedule })
 
 
                             if (showSchedule) {
