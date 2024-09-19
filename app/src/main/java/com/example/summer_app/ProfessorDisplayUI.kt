@@ -2,6 +2,8 @@ package com.example.summer_app
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
@@ -35,6 +38,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -109,10 +113,14 @@ class ProfessorDisplayUI {
         ratingData = getProfessorRatings(professor.name, LocalContext.current)
         professor.ratingData = ratingData
 
+        var showSchedule by remember { mutableStateOf(false) }
+
         Box(
             modifier = Modifier
                 .padding(start = 10.dp, end = 8.dp, top = 5.dp, bottom = 8.dp)
                 .background(color = lightGray, shape = RoundedCornerShape(16.dp))
+                .wrapContentHeight()
+                .animateContentSize()
         ) {
             Box() {
                 Column(Modifier.padding(start = 6.dp)) {
@@ -147,34 +155,38 @@ class ProfessorDisplayUI {
                                 textAlign = TextAlign.Start
                             )
 
-                            Divider(Color.Black, startText = "Schedules")
+                            Divider(Color.Black, startText = "Schedules", isClickable = true, onClick = {showSchedule = !showSchedule })
 
-                            for ((code, schedules) in professor.all_schedules) {
 
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(5.dp)
-                                            .background(scheduleGray, RoundedCornerShape(12.dp))
-                                    ) {
-                                        Column {
-                                            for (schedule in schedules) {
-                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (showSchedule) {
+                                for ((code, schedules) in professor.all_schedules) {
 
-                                                    Text(
-                                                        text = schedule.substringBefore("/"),
-                                                        fontSize = 14.sp,
-                                                        fontWeight = FontWeight.Bold,
-                                                        modifier = Modifier.padding(5.dp)
-                                                    )
-                                                    displayTag(schedule, isClassRoom = true, color = blue, textColor = Color.White)
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(5.dp)
+                                                .background(scheduleGray, RoundedCornerShape(12.dp))
+                                        ) {
+                                            Column {
+                                                for (schedule in schedules) {
+                                                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                                        Text(
+                                                            text = schedule.substringBefore("/"),
+                                                            fontSize = 14.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            modifier = Modifier.padding(5.dp)
+                                                        )
+                                                        displayTag(schedule, isClassRoom = true, color = blue, textColor = Color.White)
+                                                    }
                                                 }
                                             }
                                         }
+                                        displayTag(code, color = codeOrange, textColor = Color.Black)
                                     }
-                                    displayTag(code, color = codeOrange, textColor = Color.Black)
                                 }
                             }
+
                             Divider(Color.Black, startText = "Ratings")
                             Column {
                                 if (professor.ratingData != null) {
@@ -197,15 +209,13 @@ class ProfessorDisplayUI {
                                     }
                                 } else {
                                     Box(contentAlignment = Alignment.Center, modifier = Modifier.width(300.dp)) {
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(context = LocalContext.current)
-                                                .data(R.drawable.searching_rating)
-                                                .decoderFactory { result, options, _ ->
-                                                    ImageDecoderDecoder(result.source, options)
-                                                }
-                                                .build(),
-                                            contentDescription = "Fetching rating GIF",
-                                            modifier = Modifier.size(100.dp)
+                                        Text(
+                                            text ="Fetching professor ratings...",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Gray,
+                                            modifier = Modifier.padding(top = 10.dp, bottom = 20.dp)
+
                                         )
                                     }
                                 }
@@ -231,10 +241,26 @@ class ProfessorDisplayUI {
     }
 
     @Composable
-    fun Divider(color: Color, startText: String = ""){
+    fun Divider(color: Color, startText: String = "", isClickable: Boolean = false, onClick: () -> Unit = {}){
 
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 6.dp)) {
-            Text(startText, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 0.dp))
+            if (isClickable) {
+                Text(startText,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(start = 0.dp)
+                        .clickable { onClick() }
+                )
+            } else {
+                Text(startText,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(start = 0.dp)
+                )
+            }
+
             Divider(
                 thickness = 1.dp,
                 modifier = Modifier
