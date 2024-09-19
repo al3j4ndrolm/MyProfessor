@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -109,8 +108,10 @@ class ProfessorDisplayUI {
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun professorInformationDisplay(professor: Professor) {
+        var ratingData : ProfessorRatingData? by remember { mutableStateOf(null) }
 
-        professor.ratingData = fetchRatings(professor.name, LocalContext.current)
+        ratingData = getProfessorRatings(professor.name, LocalContext.current)
+        professor.ratingData = ratingData
 
         var showSchedule by remember { mutableStateOf(false) }
 
@@ -140,16 +141,16 @@ class ProfessorDisplayUI {
                                     ) {
                                         append(professor.name)
                                     }
-                                    append(" ")
-                                    withStyle(
-                                        style = SpanStyle(
-                                            color = Color.Gray,
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    ) {
-                                        append("${professor.ratingData.review_num} reviews")
-                                    }
+//                                    append(" ")
+//                                    withStyle(
+//                                        style = SpanStyle(
+//                                            color = Color.Gray,
+//                                            fontSize = 10.sp,
+//                                            fontWeight = FontWeight.Bold
+//                                        )
+//                                    ) {
+//                                        append("${professor.ratingData.review_num} reviews")
+//                                    }
                                 },
                                 textAlign = TextAlign.Start
                             )
@@ -188,24 +189,25 @@ class ProfessorDisplayUI {
 
                             Divider(Color.Black, startText = "Ratings")
                             Column {
-
-                                if (professor.ratingData.review_num > 0) {
-                                    ratingDisplay("Difficulty", professor.difficulty, false, true)
-                                    ratingDisplay(
-                                        "Would take again",
-                                        professor.would_take_again,
-                                        true,
-                                        false
-                                    )
-                                    ratingDisplay(
-                                        "Overall rating",
-                                        professor.overall_rating,
-                                        false,
-                                        false
-                                    )
-                                } else if (professor.num_ratings == -1) {
-                                    Text("No ratings yet")
-                                }else {
+                                if (professor.ratingData != null) {
+                                    if (professor.ratingData!!.review_num == 0) {
+                                        Text("No ratings yet")
+                                    } else {
+                                        ratingDisplay("Difficulty", professor.ratingData!!.difficulty, false, true)
+                                        ratingDisplay(
+                                            "Would take again",
+                                            professor.ratingData!!.would_take_again,
+                                            true,
+                                            false
+                                        )
+                                        ratingDisplay(
+                                            "Overall rating",
+                                            professor.ratingData!!.overall_rating,
+                                            false,
+                                            false
+                                        )
+                                    }
+                                } else {
                                     Box(contentAlignment = Alignment.Center, modifier = Modifier.width(300.dp)) {
                                         Text(
                                             text ="Fetching professor ratings...",
@@ -224,6 +226,7 @@ class ProfessorDisplayUI {
             }
         }
     }
+
     @Composable
     fun BackSearchResultButton(onClick: () -> Unit) {
         Image(

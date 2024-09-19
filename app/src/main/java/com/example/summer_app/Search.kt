@@ -7,92 +7,91 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import com.chaquo.python.PyObject
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.stream.Collectors.toList
 
 @Composable
-fun searchProfessors(department: String , courseCode: String, term: String, context:Context): List<Professor> {
-
+fun searchProfessors(
+    department: String,
+    courseCode: String,
+    termCode: String,
+    context: Context
+): List<Professor> {
     var professors by remember { mutableStateOf<List<Professor>>(emptyList()) }
+
     LaunchedEffect(Unit) {
         val result: PyObject = callPythonGetProfessorsData(
             context = context,
             department = department,
             courseCode = courseCode,
-            term = term
+            term = termCode
         )
-        professors = loadProfessorListFromPyObject(result)
+        professors = toProfessorList(result)
     }
-
     return professors
 }
 
-suspend fun loadProfessorListFromPyObject(professorsData: PyObject): List<Professor> {
+private suspend fun toProfessorList(pyObject: PyObject): List<Professor> {
     return withContext(Dispatchers.IO) {
         val gson = Gson()
-        val professorsList = mutableListOf<Professor>()
 
-        for (professorData in professorsData.asList()) {
-            professorsList.add(gson.fromJson(professorData.toString(), Professor::class.java))
-        }
+        val professorsList =
+            pyObject.asList().stream().map { gson.fromJson(it.toString(), Professor::class.java) }
+                .collect(toList())
+
         return@withContext professorsList
     }
 }
 
 @Composable
-fun getTerms(context: Context): Pair<List<String>, List<String>> {
-    var terms by remember { mutableStateOf<List<String>>(emptyList()) }
-    var code by remember { mutableStateOf<List<String>>(emptyList()) }
-
-
+fun getTerms(context: Context): List<TermData> {
+    var termDataList by remember { mutableStateOf<List<TermData>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        val result: PyObject = fetchAvailableTerms(context)
-        val (termTextList, termCodeList) = loadTermListFromPyObject(result)
-        terms = termTextList
-        code = termCodeList
+        val termDataResponse: PyObject = fetchAvailableTerms(context)
+        termDataList = toTermList(termDataResponse)
     }
-
-    return terms to code
+    return termDataList
 }
 
-suspend fun loadTermListFromPyObject(termsData: PyObject): Pair<List<String>, List<String>> {
+private suspend fun toTermList(pyObject: PyObject): List<TermData> {
     return withContext(Dispatchers.IO) {
         val gson = Gson()
-        val termsList = mutableListOf<String>()
-        val termsCodeList = mutableListOf<String>()
+        val termDataList = mutableListOf<TermData>()
 
-        for (termData in termsData.asList()) {
+        for (termData in pyObject.asList()) {
             val jsonObject = gson.fromJson(termData.toString(), JsonObject::class.java)
 
-            val termText = jsonObject.get("term_text").asString
-            termsList.add(termText)  // Add the term text to the list
-
-            val termCode = jsonObject.get("term_code").asString
-            termsCodeList.add(termCode)
-
+            termDataList.add(
+                TermData(
+                    termCode = jsonObject.get("term_code").asString,
+                    termText = jsonObject.get("term_text").asString,
+                )
+            )
         }
-        return@withContext Pair(termsList, termsCodeList)
+        return@withContext termDataList
     }
 }
 
 @Composable
-fun fetchRatings(professorName: String, context: Context): ProfessorRatingData {
+fun getProfessorRatings(professorName: String, context: Context): ProfessorRatingData {
     var professorRatingData by remember { mutableStateOf(ProfessorRatingData()) }
+
     LaunchedEffect(Unit) {
-        val result: PyObject = fetchProfessorRatings(context = context, professorName = professorName)
-        professorRatingData = loadProfessorFromPyObject(result)
+        val result: PyObject =
+            fetchProfessorRatings(context = context, professorName = professorName)
+        professorRatingData = toRatingsData(result)
     }
     return professorRatingData
 }
 
-suspend fun loadProfessorFromPyObject(professorData: PyObject): ProfessorRatingData {
+private suspend fun toRatingsData(pyObject: PyObject): ProfessorRatingData {
     return withContext(Dispatchers.IO) {
         val gson = Gson()
-        return@withContext gson.fromJson(professorData.toString(), ProfessorRatingData::class.java)
+        return@withContext gson.fromJson(pyObject.toString(), ProfessorRatingData::class.java)
     }
 }

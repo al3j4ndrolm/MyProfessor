@@ -31,6 +31,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.stream.Collectors.toList
 
 class MainScreen {
 
@@ -98,14 +100,13 @@ class MainScreen {
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun SearchScreen(context: Context) {
-        var startTime by remember { mutableLongStateOf(0L) }
+        var searchStartTime by remember { mutableLongStateOf(0L) }
         var className by remember { mutableStateOf("") }
-        var showSearchResult by remember { mutableStateOf(true) }
-        var choosenTerm by remember { mutableStateOf("unknown") }
-        var terms = getTerms(context)
-        var choosenTermCode by remember { mutableStateOf("") }
-        var isFirstTermSelected by remember { mutableStateOf(false) }
-        var isSecondTermSelected by remember { mutableStateOf(false) }
+        var showSearchResult by remember { mutableStateOf(false) }
+
+        var chosenTerm : TermData? by remember { mutableStateOf(null) }
+
+        val termDataList = getTerms(context)
 
         Box(
             modifier = Modifier
@@ -148,46 +149,41 @@ class MainScreen {
                                 bottomEnd = 0.dp,
                                 bottomStart = 16.dp
                             ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                unfocusedIndicatorColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                containerColor = Color.LightGray,
+                            colors = TextFieldDefaults.colors(
                                 focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Gray
+                                unfocusedTextColor = Color.Gray,
+                                focusedContainerColor = Color.LightGray,
+                                unfocusedContainerColor = Color.LightGray,
+                                disabledContainerColor = Color.LightGray,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
                             ),
                             modifier = Modifier
                                 .height(56.dp),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
 
                         )
-                        SearchButton(onClick = {
-                            startTime = System.currentTimeMillis()
-                            focusManager.clearFocus()
-                            if (isFirstTermSelected || isSecondTermSelected){
-                                showSearchResult = true
-                            }
+                        SearchButton(
+                            onClick = {
+                                searchStartTime = System.currentTimeMillis()
+                                focusManager.clearFocus()
+                                if (termDataList.isNotEmpty()){
+                                    showSearchResult = true
+                                }
                              },
-                            isPressed = isFirstTermSelected || isSecondTermSelected
+                            enabled = termDataList.isNotEmpty()
                         )
                     }
 
+
                     Row {
-                        if (terms.first.isNotEmpty()){
-                            termButtons(onTerm = {
-                                choosenTerm = terms.first[0]
-                                choosenTermCode = terms.second[0]
-                                isFirstTermSelected = true
-                                isSecondTermSelected = false
-                            }, terms.first[0],
-                                status = isFirstTermSelected
-                                )
-                            termButtons(onTerm = {
-                                choosenTerm = terms.first[1]
-                                choosenTermCode = terms.second[1]
-                                isSecondTermSelected = true
-                                isFirstTermSelected = false
-                            }, terms.first[1]
-                                , status = isSecondTermSelected)
+                        if (termDataList.isNotEmpty()){
+                            chosenTerm = termDataList[0]
+
+                            TermButtons(
+                                termDataList = termDataList,
+                                termCodeUpdaters = termDataList.stream().map { {chosenTerm=it} }.collect(toList()),
+                            )
                         } else {
                             Text(text = "Fetching terms...")
                         }
@@ -197,8 +193,8 @@ class MainScreen {
 
             if (showSearchResult) {
                 val (department, code) = parseCourseInfo(className.trimEnd())
-//                val professors = searchProfessors(department.uppercase(), code.uppercase(), choosenTermCode.toString(), context)
-                val professors = listOf(Professor())
+                val professors = searchProfessors(department.uppercase(), code.uppercase(),
+                    chosenTerm!!.termCode, context)
 
                 if (professors.isEmpty()) {
                     Column {
@@ -210,7 +206,9 @@ class MainScreen {
                                 .padding(top = 60.dp),
                         ) {
                             Column {
-                                professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}", "$choosenTerm")
+                                professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}",
+                                    chosenTerm!!.termText
+                                )
                                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Image(
@@ -237,9 +235,10 @@ class MainScreen {
                             .padding(top = 60.dp),
                     ) {
                         Column {
-                            professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}", "$choosenTerm", onClick = {showSearchResult = false
+                            professorDisplayUI.searchResultHeader("${department.uppercase()} ${code.uppercase()}",
+                                chosenTerm!!.termText, onClick = {showSearchResult = false
                                 className = ""})
-                            Text(text = String.format("latency: %s seconds", (endTime - startTime).toDouble()/1000.0),
+                            Text(text = String.format("latency: %s seconds", (endTime - searchStartTime).toDouble()/1000.0),
                                 fontSize = 10.sp)
 
                             Column(modifier = Modifier
@@ -257,7 +256,7 @@ class MainScreen {
         }
     }
 
-    fun parseCourseInfo(course: String): Pair<String, String> {
+    private fun parseCourseInfo(course: String): Pair<String, String> {
         val parts = course.split(" ", limit = 2)
         val department = parts.getOrElse(0) { "" }
         val code = parts.getOrElse(1) { "" }
@@ -265,14 +264,10 @@ class MainScreen {
     }
 
     @Composable
-    fun SearchButton(onClick: () -> Unit, isPressed: Boolean) {
-        val unPressedColor = Color(0xFF969696)
-        val pressedColor = Color.DarkGray
-        var statusColor = unPressedColor
-
-        if (isPressed) {
-            statusColor = pressedColor
-        }
+    fun SearchButton(onClick: () -> Unit, enabled: Boolean) {
+        val disabledColor = Color(0xFF969696)
+        val enabledColor = Color.DarkGray
+        val statusColor = if (enabled) enabledColor else disabledColor
 
         Button(
             onClick = onClick,
@@ -298,19 +293,30 @@ class MainScreen {
         }
     }
 
-
+    @Composable
+    fun TermButtons(termDataList: List<TermData>, termCodeUpdaters: List<()->Unit>) {
+        var selectedTermIndex by remember { mutableIntStateOf(0) }
+        for (i in termDataList.indices){
+            TermButton(
+                onTerm = {
+                    termCodeUpdaters[i]()
+                    selectedTermIndex = i
+                },
+                termText = termDataList[i].termText,
+                isSelected = selectedTermIndex == i
+            )
+        }
+    }
 
     @Composable
-    fun termButtons(onTerm: () -> Unit, term: String, status: Boolean){
+    fun TermButton(onTerm: () -> Unit, termText: String, isSelected: Boolean){
+        val buttonColor = if (isSelected) Color.DarkGray else Color.LightGray
 
-        var isClickedColor = Color.LightGray
-
-        if (status){
-            isClickedColor = Color.DarkGray
-        }
-
-        Button(onClick = { onTerm() }, colors = ButtonDefaults.buttonColors(isClickedColor)) {
-            Text(text = term)
+        Button(
+            onClick = { onTerm() },
+            colors = ButtonDefaults.buttonColors(buttonColor))
+        {
+            Text(text = termText)
         }
     }
 }
