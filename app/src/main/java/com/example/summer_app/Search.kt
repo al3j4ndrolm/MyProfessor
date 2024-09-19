@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.chaquo.python.PyObject
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -76,5 +77,22 @@ suspend fun loadTermListFromPyObject(termsData: PyObject): Pair<List<String>, Li
 
         }
         return@withContext Pair(termsList, termsCodeList)
+    }
+}
+
+@Composable
+fun fetchRatings(professorName: String, context: Context): ProfessorRatingData {
+    var professorRatingData by remember { mutableStateOf(ProfessorRatingData()) }
+    LaunchedEffect(Unit) {
+        val result: PyObject = fetchProfessorRatings(context = context, professorName = professorName)
+        professorRatingData = loadProfessorFromPyObject(result)
+    }
+    return professorRatingData
+}
+
+suspend fun loadProfessorFromPyObject(professorData: PyObject): ProfessorRatingData {
+    return withContext(Dispatchers.IO) {
+        val gson = Gson()
+        return@withContext gson.fromJson(professorData.toString(), ProfessorRatingData::class.java)
     }
 }
