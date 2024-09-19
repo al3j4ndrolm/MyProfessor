@@ -100,7 +100,7 @@ class MainScreen {
     fun SearchScreen(context: Context) {
         var startTime by remember { mutableLongStateOf(0L) }
         var className by remember { mutableStateOf("") }
-        var showSearchResult by remember { mutableStateOf(false) }
+        var showSearchResult by remember { mutableStateOf(true) }
         var choosenTerm by remember { mutableStateOf("unknown") }
         var terms = getTerms(context)
         var choosenTermCode by remember { mutableStateOf("") }
@@ -197,7 +197,8 @@ class MainScreen {
 
             if (showSearchResult) {
                 val (department, code) = parseCourseInfo(className.trimEnd())
-                val professors = searchProfessors(department.uppercase(), code.uppercase(), choosenTermCode.toString(), context)
+//                val professors = searchProfessors(department.uppercase(), code.uppercase(), choosenTermCode.toString(), context)
+                val professors = listOf(Professor())
 
                 if (professors.isEmpty()) {
                     Column {
