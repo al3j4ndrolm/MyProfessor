@@ -3,7 +3,6 @@ package com.example.summer_app
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,12 +37,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.decode.ImageDecoderDecoder
-import coil.request.ImageRequest
 
 class ProfessorDisplayUI {
 
@@ -57,7 +52,7 @@ class ProfessorDisplayUI {
 
 
     @Composable
-    fun searchResultHeader(classAndCode: String, currentTerm: String, onClick: () -> Unit = {}) {
+    fun SearchResultHeader(classAndCode: String, currentTerm: String, onClickBackButton: () -> Unit = {}) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -67,7 +62,7 @@ class ProfessorDisplayUI {
         ) {
 
             BackSearchResultButton(onClick = {
-                onClick()
+                onClickBackButton()
             })
 
             Text(
@@ -107,7 +102,7 @@ class ProfessorDisplayUI {
 
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
-    fun professorInformationDisplay(professor: Professor) {
+    fun ProfessorInformationDisplay(professor: Professor) {
         var ratingData : ProfessorRatingData? by remember { mutableStateOf(null) }
 
         ratingData = getProfessorRatings(professor.name, LocalContext.current)
@@ -122,7 +117,7 @@ class ProfessorDisplayUI {
                 .wrapContentHeight()
                 .animateContentSize()
         ) {
-            Box() {
+            Box {
                 Column(Modifier.padding(start = 6.dp)) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -177,12 +172,12 @@ class ProfessorDisplayUI {
                                                             fontWeight = FontWeight.Bold,
                                                             modifier = Modifier.padding(5.dp)
                                                         )
-                                                        displayTag(schedule, isClassRoom = true, color = blue, textColor = Color.White)
+                                                        DisplayTag(schedule, isClassRoom = true, color = blue, textColor = Color.White)
                                                     }
                                                 }
                                             }
                                         }
-                                        displayTag(code, color = codeOrange, textColor = Color.Black)
+                                        DisplayTag(code, color = codeOrange, textColor = Color.Black)
                                     }
                                 }
                             }
@@ -193,18 +188,21 @@ class ProfessorDisplayUI {
                                     if (professor.ratingData!!.review_num == 0) {
                                         Text("No ratings yet")
                                     } else {
-                                        ratingDisplay("Difficulty", professor.ratingData!!.difficulty, false, true)
-                                        ratingDisplay(
-                                            "Would take again",
-                                            professor.ratingData!!.would_take_again,
-                                            true,
-                                            false
+                                        RatingDisplay("Difficulty", professor.ratingData!!.difficulty,
+                                            isPercentage = false,
+                                            isDifficulty = true
                                         )
-                                        ratingDisplay(
-                                            "Overall rating",
+                                        RatingDisplay(
+                                            text = "Would take again",
+                                            professor.ratingData!!.would_take_again,
+                                            isPercentage = true,
+                                            isDifficulty = false
+                                        )
+                                        RatingDisplay(
+                                            text = "Overall rating",
                                             professor.ratingData!!.overall_rating,
-                                            false,
-                                            false
+                                            isPercentage = false,
+                                            isDifficulty = false
                                         )
                                     }
                                 } else {
@@ -215,7 +213,6 @@ class ProfessorDisplayUI {
                                             fontWeight = FontWeight.Bold,
                                             color = Color.Gray,
                                             modifier = Modifier.padding(top = 10.dp, bottom = 20.dp)
-
                                         )
                                     }
                                 }
@@ -272,7 +269,7 @@ class ProfessorDisplayUI {
     }
 
     @Composable
-    fun displayTag(value: String, isClassRoom: Boolean = false, color: Color, textColor: Color) {
+    fun DisplayTag(value: String, isClassRoom: Boolean = false, color: Color, textColor: Color) {
 
         var text = value
 
@@ -297,14 +294,14 @@ class ProfessorDisplayUI {
     }
 
     @Composable
-    fun ratingDisplay(text: String, value: Double, isPercentage: Boolean, isDifficulty: Boolean) {
+    fun RatingDisplay(text: String, value: Double, isPercentage: Boolean, isDifficulty: Boolean) {
 
         if (isPercentage) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 6.dp)
             ) {
-                percentageCircle(value)
+                PercentageCircle(value)
                 Text(
                     "${text}: ${value.toInt()} %",
                     fontSize = 14.sp,
@@ -317,9 +314,9 @@ class ProfessorDisplayUI {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 6.dp)
             ) {
-                valueCircle(value, isDifficulty)
+                ValueCircle(value, isDifficulty)
                 Text(
-                    "${text}: ${value} / 5",
+                    "${text}: $value / 5",
                     fontSize = 14.sp,
                     modifier = Modifier
                         .padding(start = 4.dp)
@@ -329,23 +326,20 @@ class ProfessorDisplayUI {
     }
 
     @Composable
-    fun valueCircle(value: Double, isDifficulty: Boolean) {
-
-        var color: Color
-
-        if (value > 4.0) {
+    fun ValueCircle(value: Double, isDifficulty: Boolean) {
+        val color: Color = if (value > 4.0) {
             if (isDifficulty) {
-                color = red
+                red
             } else {
-                color = green
+                green
             }
         } else if (value > 3.0) {
-            color = orange
+            orange
         } else {
             if (isDifficulty) {
-                color = green
+                green
             } else {
-                color = red
+                red
             }
         }
 
@@ -358,15 +352,13 @@ class ProfessorDisplayUI {
     }
 
     @Composable
-    fun percentageCircle(value: Double) {
-        var color: Color
-
-        if (value > 80.0) {
-            color = green
+    fun PercentageCircle(value: Double) {
+        val color: Color = if (value > 80.0) {
+            green
         } else if (value > 60.0) {
-            color = orange
+            orange
         } else {
-            color = red
+            red
         }
 
         Canvas(modifier = Modifier.size(16.dp)) {
