@@ -22,8 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,22 +49,22 @@ import java.util.stream.Collectors.toList
 class MainScreen {
     private val defaultFont = FontFamily(Font(R.font.futura))
     private val professorDisplayUI = ProfessorDisplayUI()
+    private var chosenTerm : TermData? = null
+    private var isTermsSelected : Boolean = false
 
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
-    fun Run(context: Context) {
+    fun Launch(context: Context) {
         SearchScreen(context)
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun SearchScreen(context: Context) {
+
         var searchStartTime by remember { mutableLongStateOf(0L) }
         var className by remember { mutableStateOf("") }
         var showSearchResult by remember { mutableStateOf(false) }
-        var chosenTerm : TermData? by remember { mutableStateOf(null) }
-
-        val termDataList = getTerms(context)
 
         Box(
             modifier = Modifier
@@ -122,33 +124,29 @@ class MainScreen {
                             onClick = {
                                 searchStartTime = System.currentTimeMillis()
                                 focusManager.clearFocus()
-                                if (termDataList.isNotEmpty()){
+                                if (isTermsSelected) {
                                     showSearchResult = true
                                 }
-                             },
-                            enabled = termDataList.isNotEmpty()
+                            },
+                            enabled = isTermsSelected
                         )
                     }
 
-                    Row {
-                        if (termDataList.isNotEmpty()){
-                            chosenTerm = termDataList[0]
-
-                            TermButtons(
-                                termDataList = termDataList,
-                                termCodeUpdaters = termDataList.stream().map { {chosenTerm=it} }.collect(toList()),
-                            )
-                        } else {
-                            Text(text = "Fetching terms...")
-                        }
-                    }
+                    TermOptionsRow(
+                        context = context,
+                        updateChosenTerm = {
+                            chosenTerm = it
+                        },
+                    )
                 }
             }
 
             if (showSearchResult) {
                 val (department, code) = parseCourseInfo(className.trimEnd())
-                val professors = searchProfessors(department.uppercase(), code.uppercase(),
-                    chosenTerm!!.termCode, context)
+                val professors = searchProfessors(
+                    department.uppercase(), code.uppercase(),
+                    chosenTerm!!.termCode, context
+                )
 
                 Box(
                     Modifier
@@ -158,27 +156,47 @@ class MainScreen {
                         .padding(top = 60.dp),
                 ) {
                     Column {
-                        professorDisplayUI.SearchResultHeader("${department.uppercase()} ${code.uppercase()}",
-                            chosenTerm!!.termText
+                        professorDisplayUI.SearchResultHeader(
+                            "${department.uppercase()} ${code.uppercase()}",
+                            chosenTerm!!.termText,
+                            onClickBackButton = {
+                                showSearchResult = false
+                                className = ""
+                            }
                         )
-                        if (professors.isEmpty()){
-                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        if (professors.isEmpty()) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Image(
                                         modifier = Modifier
                                             .size(100.dp),
                                         colorFilter = ColorFilter.tint(Color.LightGray),
                                         painter = painterResource(R.drawable.person_search_24px),
-                                        contentDescription = "Search professor")
-                                    Text("Searching for professors...", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.LightGray)
+                                        contentDescription = "Search professor"
+                                    )
+                                    Text(
+                                        "Searching for professors...",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.LightGray
+                                    )
                                 }
                             }
                         } else {
-                            Text(text = String.format("latency: %s seconds", (System.currentTimeMillis() - searchStartTime).toDouble()/1000.0), fontSize = 10.sp)
+                            Text(
+                                text = String.format(
+                                    "latency: %s seconds",
+                                    (System.currentTimeMillis() - searchStartTime).toDouble() / 1000.0
+                                ), fontSize = 10.sp
+                            )
 
-                            Column(modifier = Modifier
-                                .fillMaxWidth()
-                                .verticalScroll(rememberScrollState()),
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .verticalScroll(rememberScrollState()),
                             ) {
                                 for (professor in professors) {
                                     professorDisplayUI.ProfessorInformationDisplay(professor)
@@ -187,6 +205,36 @@ class MainScreen {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    fun TermOptionsRow(context: Context, updateChosenTerm: (TermData) -> Unit) {
+        val termDataList = remember { mutableStateListOf<TermData>() }
+
+        LaunchedEffect(Unit) {
+            fetchAvailableTerms(
+                context = context,
+                onResultReceived = {
+                    termDataList.addAll(it)
+                    if (termDataList.isNotEmpty()) {
+                        chosenTerm = termDataList[0]
+                    }
+                    isTermsSelected = true
+                }
+            )
+        }
+
+        Row {
+            if (termDataList.isNotEmpty()) {
+                TermButtons(
+                    termDataList = termDataList,
+                    termCodeUpdaters = termDataList.stream().map { { updateChosenTerm(it) } }
+                        .collect(toList()),
+                )
+            } else {
+                Text(text = "Fetching terms...")
             }
         }
     }

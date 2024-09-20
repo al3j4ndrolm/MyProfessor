@@ -11,7 +11,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import com.example.summer_app.TermData
 
-
 @Composable
 fun TermButtons(termDataList: List<TermData>, termCodeUpdaters: List<()->Unit>) {
     var selectedTermIndex by remember { mutableIntStateOf(0) }
@@ -29,7 +28,7 @@ fun TermButtons(termDataList: List<TermData>, termCodeUpdaters: List<()->Unit>) 
 
 @Composable
 fun TermButton(onTerm: () -> Unit, termText: String, isSelected: Boolean){
-    val buttonColor = if (isSelected) Color.DarkGray else Color.LightGray
+    val buttonColor = if (isSelected) BUTTON_SELECTED_COLOR else BUTTON_UNSELECTED_COLOR
 
     Button(
         onClick = { onTerm() },
@@ -38,3 +37,6 @@ fun TermButton(onTerm: () -> Unit, termText: String, isSelected: Boolean){
         Text(text = termText)
     }
 }
+
+private val BUTTON_SELECTED_COLOR = Color.DarkGray
+private val BUTTON_UNSELECTED_COLOR = Color.LightGray

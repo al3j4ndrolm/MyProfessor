@@ -24,11 +24,11 @@ fun searchProfessors(
     var professors by remember { mutableStateOf<List<Professor>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        val result: PyObject = callPythonGetProfessorsData(
+        val result: PyObject = fetchProfessors(
             context = context,
             department = department,
             courseCode = courseCode,
-            term = termCode
+            term = termCode,
         )
         professors = toProfessorList(result)
     }
@@ -44,36 +44,6 @@ private suspend fun toProfessorList(pyObject: PyObject): List<Professor> {
                 .collect(toList())
 
         return@withContext professorsList
-    }
-}
-
-@Composable
-fun getTerms(context: Context): List<TermData> {
-    var termDataList by remember { mutableStateOf<List<TermData>>(emptyList()) }
-
-    LaunchedEffect(Unit) {
-        val termDataResponse: PyObject = fetchAvailableTerms(context)
-        termDataList = toTermList(termDataResponse)
-    }
-    return termDataList
-}
-
-private suspend fun toTermList(pyObject: PyObject): List<TermData> {
-    return withContext(Dispatchers.IO) {
-        val gson = Gson()
-        val termDataList = mutableListOf<TermData>()
-
-        for (termData in pyObject.asList()) {
-            val jsonObject = gson.fromJson(termData.toString(), JsonObject::class.java)
-
-            termDataList.add(
-                TermData(
-                    termCode = jsonObject.get("term_code").asString,
-                    termText = jsonObject.get("term_text").asString,
-                )
-            )
-        }
-        return@withContext termDataList
     }
 }
 

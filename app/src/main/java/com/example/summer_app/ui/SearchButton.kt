@@ -16,9 +16,7 @@ import com.example.summer_app.R
 
 @Composable
 fun SearchButton(onClick: () -> Unit, enabled: Boolean) {
-    val disabledColor = Color(0xFF969696)
-    val enabledColor = Color.DarkGray
-    val statusColor = if (enabled) enabledColor else disabledColor
+    val statusColor = if (enabled) ENABLED_COLOR else DISABLED_COLOR
 
     Button(
         onClick = onClick,
@@ -37,9 +35,12 @@ fun SearchButton(onClick: () -> Unit, enabled: Boolean) {
             painterResource(
                 R.drawable.search_24dp_434343_fill0_wght400_grad0_opsz24
             ),
-            "search",
+            "dashboard search button",
             modifier = Modifier.size(35.dp),
             colorFilter = ColorFilter.tint(statusColor)
         )
     }
 }
+
+private val DISABLED_COLOR = Color(0xFF969696)
+private val ENABLED_COLOR = Color.DarkGray
