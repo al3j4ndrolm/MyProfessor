@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.summer_app.ui.theme.Summer_appTheme
 
 // collaborator test: sheepyd3v
+// debugging test
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
