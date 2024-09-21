@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.stream.Collectors.toList
 
-internal fun fetchProfessors(
+internal fun searchProfessors(
     context: Context,
     department: String,
     courseCode: String,
@@ -34,7 +34,7 @@ internal fun fetchProfessors(
     }
 }
 
-internal fun fetchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> Unit) {
+internal fun searchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> Unit) {
     CoroutineScope(Dispatchers.IO).launch {
         val pyScript = getPythonScript(context = context, scriptName = "ProfessorsFetcher")
         val result = pyScript.callAttr("get_terms")
@@ -47,7 +47,7 @@ internal fun fetchAvailableTerms(context: Context, onResultReceived: (List<TermD
     }
 }
 
-fun fetchProfessorRatings(
+fun searchProfessorRatings(
     context: Context,
     professorName: String,
     onResultReceived: (ProfessorRatingData) -> Unit

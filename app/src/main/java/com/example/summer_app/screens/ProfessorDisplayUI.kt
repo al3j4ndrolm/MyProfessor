@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.example.summer_app.R
 import com.example.summer_app.data.Professor
 import com.example.summer_app.data.ProfessorRatingData
-import com.example.summer_app.usecase.fetchProfessorRatings
+import com.example.summer_app.usecase.DataManager
 
 private val lightGray = Color(0xFFedecec)
 private val green = Color(0xFFc2ff72)
@@ -54,12 +54,12 @@ private val scheduleGray = Color(0xFFd1cece)
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ProfessorInformationDisplay(professor: Professor) {
+fun ProfessorInformationDisplay(dataManager: DataManager, professor: Professor) {
     val context = LocalContext.current
     var ratingData: ProfessorRatingData? by remember { mutableStateOf(professor.ratingData) }
 
     LaunchedEffect(Unit) {
-        fetchProfessorRatings(
+        dataManager.fetchProfessorRatings(
             context = context,
             professorName = professor.name,
             onResultReceived = {

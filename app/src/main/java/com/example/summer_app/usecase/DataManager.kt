@@ -8,6 +8,7 @@ import com.example.summer_app.data.TermData
 class DataManager {
     val availableTerms: MutableList<TermData> = mutableListOf()
 
+    private val cachedProfessorRatingData:MutableMap<String, ProfessorRatingData> = mutableMapOf()
     private var isSearchProfessorsPending = false
 
     fun startSearchingProfessors(
@@ -17,15 +18,23 @@ class DataManager {
         term: String,
         onResultReceived: (List<Professor>) -> Unit,
     ) {
+        val startTimestamp = System.currentTimeMillis()
         isSearchProfessorsPending = true
 
-        fetchProfessors(
+        searchProfessors(
             context = context,
             department = department,
             courseCode = courseCode,
             term = term,
             onResultReceived = {
                 if (isSearchProfessorsPending){
+                    isSearchProfessorsPending = false
+                    println(
+                        String.format(
+                            "Completed professors fetching in %s seconds.",
+                            getDurationInSeconds(startTimestamp)
+                        )
+                    )
                     onResultReceived(it)
                 }
             })
@@ -35,7 +44,7 @@ class DataManager {
         isSearchProfessorsPending = false
     }
 
-    fun searchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> Unit){
+    fun fetchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> Unit){
         if (availableTerms.isNotEmpty()) {
             onResultReceived(availableTerms)
             return
@@ -43,7 +52,7 @@ class DataManager {
 
         val startTimestamp = System.currentTimeMillis()
 
-        fetchAvailableTerms(
+        searchAvailableTerms(
             context = context,
             onResultReceived = {
                 println(
@@ -57,12 +66,23 @@ class DataManager {
             })
     }
 
-    fun searchProfessorRatings(
+    fun fetchProfessorRatings(
         context: Context,
         professorName: String,
         onResultReceived: (ProfessorRatingData) -> Unit
     ) {
+        if (cachedProfessorRatingData.containsKey(professorName)){
+            cachedProfessorRatingData[professorName]?.let { onResultReceived(it) }
+            return
+        }
 
+        searchProfessorRatings(
+            context = context,
+            professorName = professorName,
+            onResultReceived = {
+                cachedProfessorRatingData[professorName] = it
+                onResultReceived(it)
+            })
     }
 
     companion object {

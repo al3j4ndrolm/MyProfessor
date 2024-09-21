@@ -51,7 +51,6 @@ import com.example.summer_app.ui.SearchInputTextField
 import com.example.summer_app.ui.SearchLoadingScene
 import com.example.summer_app.ui.TermButtons
 import com.example.summer_app.usecase.DataManager
-import com.example.summer_app.usecase.DataManager.Companion.getDurationInSeconds
 import java.util.stream.Collectors.toList
 
 class MainScreen {
@@ -60,8 +59,6 @@ class MainScreen {
     private var professors: List<Professor> = listOf()
     private var searchInput: String = ""
     private var searchInfo: SearchInfo = SearchInfo()
-
-    private var searchStartTime: Long = 0L
 
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
@@ -113,7 +110,6 @@ class MainScreen {
                         val (searchInput1, searchInput2) = parseCourseInfo(searchInput)
                         searchInfo.department = searchInput1
                         searchInfo.courseCode = searchInput2
-                        searchStartTime = System.currentTimeMillis()
                         onEnterLoadingScreen()
                     },
                     enabled = searchInfo.isReady()
@@ -164,8 +160,6 @@ class MainScreen {
                 onClickBackButton = onBackToSearchScreen
             )
 
-            LatencyText()
-
             if (professors.isEmpty()) {
                 Text("NADA is found", textAlign = TextAlign.Center, fontSize = 40.sp)
             } else {
@@ -175,7 +169,7 @@ class MainScreen {
                         .padding(16.dp),
                 ) {
                     items(professors) { item ->
-                        ProfessorInformationDisplay(item)
+                        ProfessorInformationDisplay(dataManager = dataManager, professor = item)
                     }
                 }
             }
@@ -198,7 +192,7 @@ class MainScreen {
         var hasTerms by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
-            dataManager.searchAvailableTerms(
+            dataManager.fetchAvailableTerms(
                 context = context,
                 onResultReceived = {
                     hasTerms = true
@@ -262,14 +256,6 @@ class MainScreen {
             )
             DeAnzaCollegeLogo()
         }
-    }
-
-    @Composable
-    private fun LatencyText() {
-        Text(
-            text = String.format("latency: %s seconds", getDurationInSeconds(searchStartTime)),
-            fontSize = 10.sp
-        )
     }
 
     private fun parseCourseInfo(searchInput: String): Pair<String, String> {
