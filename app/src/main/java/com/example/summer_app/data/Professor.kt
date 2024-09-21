@@ -1,4 +1,4 @@
-package com.example.summer_app
+package com.example.summer_app.data
 
 
 data class Professor(

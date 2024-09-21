@@ -1,7 +1,5 @@
 package com.example.summer_app.data
 
-import com.example.summer_app.TermData
-
 data class SearchInfo(
     var department:String = "",
     var courseCode:String = "",

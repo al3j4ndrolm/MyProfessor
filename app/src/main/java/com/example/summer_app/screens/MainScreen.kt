@@ -1,4 +1,4 @@
-package com.example.summer_app
+package com.example.summer_app.screens
 
 import android.content.Context
 import android.os.Build
@@ -35,21 +35,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.summer_app.ScreenSection.SEARCH_LOADING
-import com.example.summer_app.ui.DashboardHeader
-import com.example.summer_app.ScreenSection.SEARCH_INPUT
-import com.example.summer_app.ScreenSection.SEARCH_RESULT
+import com.example.summer_app.R
+import com.example.summer_app.data.Professor
+import com.example.summer_app.data.ScreenSection
+import com.example.summer_app.data.ScreenSection.SEARCH_INPUT
+import com.example.summer_app.data.ScreenSection.SEARCH_LOADING
+import com.example.summer_app.data.ScreenSection.SEARCH_RESULT
 import com.example.summer_app.data.SearchInfo
+import com.example.summer_app.data.TermData
+import com.example.summer_app.ui.DashboardHeader
 import com.example.summer_app.ui.DeAnzaCollegeLogo
+import com.example.summer_app.ui.SearchBoxGuideText
 import com.example.summer_app.ui.SearchButton
 import com.example.summer_app.ui.SearchInputTextField
-import com.example.summer_app.ui.SearchBoxGuideText
 import com.example.summer_app.ui.SearchLoadingScene
 import com.example.summer_app.ui.TermButtons
+import com.example.summer_app.usecase.DataManager
+import com.example.summer_app.usecase.DataManager.Companion.getDurationInSeconds
 import java.util.stream.Collectors.toList
 
 class MainScreen {
-    private val availableTerms : MutableList<TermData> = mutableListOf()
+    private val dataManager: DataManager = DataManager()
 
     private var professors: List<Professor> = listOf()
     private var searchInput: String = ""
@@ -89,7 +95,9 @@ class MainScreen {
     @Composable
     fun SearchInputScreen(context: Context, onEnterLoadingScreen: () -> Unit) {
         Column(
-            modifier = Modifier.padding(16.dp).windowInsetsPadding(WindowInsets.ime),
+            modifier = Modifier
+                .padding(16.dp)
+                .windowInsetsPadding(WindowInsets.ime),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DashboardHeader()
@@ -122,9 +130,13 @@ class MainScreen {
     }
 
     @Composable
-    fun SearchLoadingScreen(context: Context, onEnterResultScreen: () -> Unit, onBackToSearchScreen: () -> Unit) {
+    fun SearchLoadingScreen(
+        context: Context,
+        onEnterResultScreen: () -> Unit,
+        onBackToSearchScreen: () -> Unit
+    ) {
         LaunchedEffect(Unit) {
-            fetchProfessors(
+            dataManager.startSearchingProfessors(
                 context = context,
                 department = searchInfo.department,
                 courseCode = searchInfo.courseCode,
@@ -136,7 +148,10 @@ class MainScreen {
             )
         }
         SearchResultHeader(
-            onClickBackButton = onBackToSearchScreen
+            onClickBackButton = {
+                dataManager.stopSearchingProfessors()
+                onBackToSearchScreen()
+            }
         )
         SearchLoadingScene()
     }
@@ -144,7 +159,7 @@ class MainScreen {
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun ResultScreen(onBackToSearchScreen: () -> Unit) {
-        Column  {
+        Column {
             SearchResultHeader(
                 onClickBackButton = onBackToSearchScreen
             )
@@ -156,7 +171,8 @@ class MainScreen {
             } else {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth().padding(16.dp),
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 ) {
                     items(professors) { item ->
                         ProfessorInformationDisplay(item)
@@ -168,7 +184,8 @@ class MainScreen {
 
     @Composable
     private fun TermOptionsRow(context: Context, updateChosenTerm: (TermData) -> Unit) {
-        if (availableTerms.isNotEmpty()) {
+        if (dataManager.availableTerms.isNotEmpty()) {
+            val availableTerms = dataManager.availableTerms
             TermButtons(
                 termDataList = availableTerms,
                 termCodeUpdaters = availableTerms.stream().map { { updateChosenTerm(it) } }
@@ -178,32 +195,25 @@ class MainScreen {
             return
         }
 
-        val termDataList = remember { mutableStateListOf<TermData>() }
+        var hasTerms by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
-            val startTimestamp = System.currentTimeMillis()
-            fetchAvailableTerms(
+            dataManager.searchAvailableTerms(
                 context = context,
                 onResultReceived = {
-                    println(
-                        String.format(
-                            "Completed terms fetching in %s seconds.",
-                            getDurationInSeconds(startTimestamp)
-                        )
-                    )
-                    availableTerms.addAll(it)
-                    termDataList.addAll(it)
-                    if (termDataList.isNotEmpty()) {
-                        searchInfo.term = termDataList[0]
+                    hasTerms = true
+                    if (it.isNotEmpty()){
+                        searchInfo.term = it[0]
                     }
                 }
             )
         }
 
-        if (termDataList.isNotEmpty()) {
+        if (hasTerms) {
+            val availableTerms = dataManager.availableTerms
             TermButtons(
-                termDataList = termDataList,
-                termCodeUpdaters = termDataList.stream().map { { updateChosenTerm(it) } }
+                termDataList = availableTerms,
+                termCodeUpdaters = availableTerms.stream().map { { updateChosenTerm(it) } }
                     .collect(toList()),
                 selectedIndex = 0,
             )
@@ -257,10 +267,8 @@ class MainScreen {
     @Composable
     private fun LatencyText() {
         Text(
-            text = String.format(
-                "latency: %s seconds",
-                (System.currentTimeMillis() - searchStartTime).toDouble() / 1000.0
-            ), fontSize = 10.sp
+            text = String.format("latency: %s seconds", getDurationInSeconds(searchStartTime)),
+            fontSize = 10.sp
         )
     }
 
@@ -271,15 +279,12 @@ class MainScreen {
             partsBySpace
         } else {
             val index = input.indexOfFirst { it.isDigit() }
-            listOf(input.substring(0, index-1), input.substring(index))
+            listOf(input.substring(0, index - 1), input.substring(index))
         }
         val department = parts.getOrElse(0) { "" }.uppercase()
         val code = parts.getOrElse(1) { "" }.uppercase()
         return Pair(department, code)
     }
-
-    private fun getDurationInSeconds(startTimestamp: Long) =
-        (System.currentTimeMillis() - startTimestamp).toDouble() / 1000.0
 
     companion object {
         val APP_DEFAULT_FONT = FontFamily(Font(R.font.futura))

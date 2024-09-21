@@ -1,4 +1,4 @@
-package com.example.summer_app
+package com.example.summer_app.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -39,6 +39,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.summer_app.R
+import com.example.summer_app.data.Professor
+import com.example.summer_app.data.ProfessorRatingData
+import com.example.summer_app.usecase.fetchProfessorRatings
 
 private val lightGray = Color(0xFFedecec)
 private val green = Color(0xFFc2ff72)
