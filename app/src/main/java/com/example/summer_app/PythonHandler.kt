@@ -10,42 +10,25 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-fun fetchProfessors(
-    context: Context,
-    department: String,
-    courseCode: String,
-    term: String
-): PyObject {
-    val pyScript = getPythonScript(context = context, scriptName = "ProfessorsFetcher")
-
-    // Call the function from the Python script
-    return pyScript.callAttr("get_professors_data", department, courseCode, term)
-}
+import java.util.stream.Collectors.toList
 
 fun fetchProfessors(
     context: Context,
     department: String,
     courseCode: String,
     term: String,
-    onResultReceived: (PyObject) -> Unit,
+    onResultReceived: (List<Professor>) -> Unit,
 ) {
     CoroutineScope(Dispatchers.IO).launch {
         val pyScript = getPythonScript(context = context, scriptName = "ProfessorsFetcher")
         val result = pyScript.callAttr("get_professors_data", department, courseCode, term)
+        val professorsData = toProfessorList(result)
 
         // Switch back to the main thread to update UI if necessary
         withContext(Dispatchers.Main) {
-            onResultReceived(result)
+            onResultReceived(professorsData)
         }
     }
-}
-
-fun fetchAvailableTerms(context: Context): PyObject {
-    val pyScript = getPythonScript(context = context, scriptName = "ProfessorsFetcher")
-
-    // Call the function from the Python script
-    return pyScript.callAttr("get_terms")
 }
 
 fun fetchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> Unit) {
@@ -61,12 +44,24 @@ fun fetchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> 
     }
 }
 
-fun fetchProfessorRatings(context: Context, professorName: String): PyObject {
-    val pyScript = getPythonScript(context = context, scriptName = "RatingsFetcher")
-    return pyScript.callAttr("get_ratings", professorName)
+fun fetchProfessorRatings(
+    context: Context,
+    professorName: String,
+    onResultReceived: (ProfessorRatingData) -> Unit
+) {
+    CoroutineScope(Dispatchers.IO).launch {
+        val pyScript = getPythonScript(context = context, scriptName = "RatingsFetcher")
+        val result = pyScript.callAttr("get_ratings", professorName)
+        val ratingData = toRatingsData(result)
+
+        // Switch back to the main thread to update UI if necessary
+        withContext(Dispatchers.Main) {
+            onResultReceived(ratingData)
+        }
+    }
 }
 
-fun getPythonScript(context: Context, scriptName: String): PyObject {
+private fun getPythonScript(context: Context, scriptName: String): PyObject {
     if (!Python.isStarted()) {
         Python.start(AndroidPlatform(context))
     }
@@ -91,4 +86,21 @@ private fun toTermList(pyObject: PyObject): List<TermData> {
         )
     }
     return termDataList
+}
+
+private fun toProfessorList(pyObject: PyObject): List<Professor> {
+    val gson = Gson()
+
+    val professorsList =
+        pyObject.asList().stream().map { gson.fromJson(it.toString(), Professor::class.java) }
+            .collect(toList())
+
+    return professorsList
+}
+
+private suspend fun toRatingsData(pyObject: PyObject): ProfessorRatingData {
+    return withContext(Dispatchers.IO) {
+        val gson = Gson()
+        return@withContext gson.fromJson(pyObject.toString(), ProfessorRatingData::class.java)
+    }
 }

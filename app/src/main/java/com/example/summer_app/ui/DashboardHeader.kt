@@ -22,6 +22,7 @@ import com.example.summer_app.R
 @Composable
 fun DashboardHeader() {
     Spacer(Modifier.height(16.dp))
+
     Column(
         Modifier
             .fillMaxWidth()
