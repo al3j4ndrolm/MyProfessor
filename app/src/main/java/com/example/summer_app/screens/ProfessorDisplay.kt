@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.sp
 import com.example.summer_app.R
 import com.example.summer_app.data.Professor
 import com.example.summer_app.data.ProfessorRatingData
+import com.example.summer_app.ui.ProfessorRatingDisplay
+import com.example.summer_app.ui.ProfessorRatingLoading
 import com.example.summer_app.usecase.DataManager
 
 private val lightGray = Color(0xFFedecec)
@@ -67,8 +69,6 @@ fun ProfessorInformationDisplay(dataManager: DataManager, professor: Professor) 
                 ratingData = it
             })
     }
-
-    var showSchedule by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -117,83 +117,59 @@ fun ProfessorInformationDisplay(dataManager: DataManager, professor: Professor) 
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             if (ratingData != null) {
-                                if (ratingData!!.review_num == 0) {
-                                    Text("No ratings yet")
-                                } else {
-                                    RatingDisplay(
-                                        "Difficulty", ratingData!!.difficulty,
-                                        isPercentage = false,
-                                        isDifficulty = true
-                                    )
-                                    RatingDisplay(
-                                        text = "Recommend",
-                                        professor.ratingData!!.would_take_again,
-                                        isPercentage = true,
-                                        isDifficulty = false
-                                    )
-                                    RatingDisplay(
-                                        text = "Rating",
-                                        professor.ratingData!!.overall_rating,
-                                        isPercentage = false,
-                                        isDifficulty = false
-                                    )
-                                }
+                                ProfessorRatingDisplay(ratingData!!)
                             } else {
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.width(300.dp)
-                                ) {
-                                    Text(
-                                        text = "Fetching professor ratings...",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Gray,
-                                        modifier = Modifier.padding(top = 10.dp, bottom = 20.dp)
-                                    )
-                                }
+                                ProfessorRatingLoading()
                             }
                         }
 
-                        Divider(
-                            Color.Black,
-                            startText = "Schedules",
-                            isClickable = true,
-                            onClick = { showSchedule = !showSchedule })
-                        if (showSchedule) {
-                            for ((code, schedules) in professor.all_schedules) {
+                        ScheduleSection(professor.all_schedules)
+                    }
+                }
+            }
+        }
+    }
+}
 
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(5.dp)
-                                            .background(scheduleGray, RoundedCornerShape(12.dp))
-                                    ) {
-                                        Column {
-                                            for (schedule in schedules) {
-                                                Row(verticalAlignment = Alignment.CenterVertically) {
+@Composable
+fun ScheduleSection(allSchedules : Map<String, List<String>>) {
+    var showSchedule by remember { mutableStateOf(false) }
 
-                                                    Text(
-                                                        text = schedule.substringBefore("/"),
-                                                        fontSize = 14.sp,
-                                                        fontWeight = FontWeight.Bold,
-                                                        modifier = Modifier.padding(5.dp)
-                                                    )
-                                                    DisplayTag(
-                                                        schedule,
-                                                        isClassRoom = true,
-                                                        color = blue,
-                                                        textColor = Color.White
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                    DisplayTag(code, color = codeOrange, textColor = Color.Black)
-                                }
+    Divider(
+        Color.Black,
+        startText = "Schedules",
+        isClickable = true,
+        onClick = { showSchedule = !showSchedule })
+
+    if (showSchedule) {
+        for ((code, schedules) in allSchedules) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .background(scheduleGray, RoundedCornerShape(12.dp))
+                ) {
+                    Column {
+                        for (schedule in schedules) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                Text(
+                                    text = schedule.substringBefore("/"),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(5.dp)
+                                )
+                                DisplayTag(
+                                    schedule,
+                                    isClassRoom = true,
+                                    color = blue,
+                                    textColor = Color.White
+                                )
                             }
                         }
                     }
                 }
+                DisplayTag(code, color = codeOrange, textColor = Color.Black)
             }
         }
     }

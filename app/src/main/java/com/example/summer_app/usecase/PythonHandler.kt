@@ -47,7 +47,7 @@ internal fun searchAvailableTerms(context: Context, onResultReceived: (List<Term
     }
 }
 
-fun searchProfessorRatings(
+internal fun searchProfessorRatings(
     context: Context,
     professorName: String,
     onResultReceived: (ProfessorRatingData) -> Unit
