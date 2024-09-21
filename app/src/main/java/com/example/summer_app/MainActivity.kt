@@ -9,10 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.summer_app.ui.theme.Summer_appTheme
-
-// collaborator test: sheepyd3v
-// debugging test: al3j4ndro
+import com.example.summer_app.ui.theme.MyProfessorTheme
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
@@ -20,8 +17,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Summer_appTheme {
-                MainScreen().Run(this.applicationContext)
+            MyProfessorTheme {
+                MainScreen().Launch(this.applicationContext)
             }
         }
     }
@@ -31,8 +28,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun GreetingPreview() {
-
-    Summer_appTheme {
-        MainScreen().Run(LocalContext.current)
+    MyProfessorTheme {
+        MainScreen().Launch(LocalContext.current)
     }
 }
