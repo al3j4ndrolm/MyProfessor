@@ -98,9 +98,7 @@ private fun toProfessorList(pyObject: PyObject): List<Professor> {
     return professorsList
 }
 
-private suspend fun toRatingsData(pyObject: PyObject): ProfessorRatingData {
-    return withContext(Dispatchers.IO) {
-        val gson = Gson()
-        return@withContext gson.fromJson(pyObject.toString(), ProfessorRatingData::class.java)
-    }
+private fun toRatingsData(pyObject: PyObject): ProfessorRatingData {
+    val gson = Gson()
+    return gson.fromJson(pyObject.toString(), ProfessorRatingData::class.java)
 }
