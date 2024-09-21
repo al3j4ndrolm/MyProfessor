@@ -92,15 +92,17 @@ fun ProfessorInformationDisplay(professor: Professor) {
                                 ) {
                                     append(professor.name)
                                 }
-                                append(" ")
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = Color.Gray,
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                ) {
-                                    append("${ratingData!!.review_num} reviews")
+                                if (ratingData != null){
+                                    append(" ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = Color.Gray,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    ) {
+                                        append("${ratingData!!.review_num} reviews")
+                                    }
                                 }
                             },
                             textAlign = TextAlign.Start
