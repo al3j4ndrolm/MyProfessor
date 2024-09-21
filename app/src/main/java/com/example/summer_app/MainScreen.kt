@@ -3,19 +3,16 @@ package com.example.summer_app
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -29,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
@@ -93,39 +89,35 @@ class MainScreen {
     @Composable
     fun SearchInputScreen(context: Context, onEnterLoadingScreen: () -> Unit) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp).windowInsetsPadding(WindowInsets.ime),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DashboardHeader()
             SearchBoxGuideText()
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row {
-                    SearchInputTextField {
-                        searchInput = it
-                    }
-
-                    SearchButton(
-                        onClick = {
-                            val (searchInput1, searchInput2) = parseCourseInfo(searchInput)
-                            searchInfo.department = searchInput1
-                            searchInfo.courseCode = searchInput2
-                            searchStartTime = System.currentTimeMillis()
-                            onEnterLoadingScreen()
-                        },
-                        enabled = searchInfo.isReady()
-                    )
+            Row {
+                SearchInputTextField {
+                    searchInput = it
                 }
 
-                TermOptionsRow(
-                    context = context,
-                    updateChosenTerm = {
-                        searchInfo.term = it
+                SearchButton(
+                    onClick = {
+                        val (searchInput1, searchInput2) = parseCourseInfo(searchInput)
+                        searchInfo.department = searchInput1
+                        searchInfo.courseCode = searchInput2
+                        searchStartTime = System.currentTimeMillis()
+                        onEnterLoadingScreen()
                     },
+                    enabled = searchInfo.isReady()
                 )
             }
+
+            TermOptionsRow(
+                context = context,
+                updateChosenTerm = {
+                    searchInfo.term = it
+                },
+            )
         }
     }
 
@@ -231,7 +223,7 @@ class MainScreen {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            BackSearchResultButton(onClick = {
+            BackToSearchScreenButton(onClick = {
                 onClickBackButton()
             })
 

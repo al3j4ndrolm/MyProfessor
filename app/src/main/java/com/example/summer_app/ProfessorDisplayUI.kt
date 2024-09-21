@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,10 +51,18 @@ private val scheduleGray = Color(0xFFd1cece)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ProfessorInformationDisplay(professor: Professor) {
-    var ratingData: ProfessorRatingData? by remember { mutableStateOf(null) }
+    val context = LocalContext.current
+    var ratingData: ProfessorRatingData? by remember { mutableStateOf(professor.ratingData) }
 
-//        ratingData = getProfessorRatings(professor.name, LocalContext.current)
-    professor.ratingData = ratingData
+    LaunchedEffect(Unit) {
+        fetchProfessorRatings(
+            context = context,
+            professorName = professor.name,
+            onResultReceived = {
+                professor.ratingData = it
+                ratingData = it
+            })
+    }
 
     var showSchedule by remember { mutableStateOf(false) }
 
@@ -84,32 +92,30 @@ fun ProfessorInformationDisplay(professor: Professor) {
                                 ) {
                                     append(professor.name)
                                 }
-//                                    append(" ")
-//                                    withStyle(
-//                                        style = SpanStyle(
-//                                            color = Color.Gray,
-//                                            fontSize = 10.sp,
-//                                            fontWeight = FontWeight.Bold
-//                                        )
-//                                    ) {
-//                                        append("${professor.ratingData.review_num} reviews")
-//                                    }
+                                append(" ")
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.Gray,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                ) {
+                                    append("${ratingData!!.review_num} reviews")
+                                }
                             },
                             textAlign = TextAlign.Start
                         )
 
-
-//                            Divider(Color.Black, startText = "Ratings")
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            if (professor.ratingData != null) {
-                                if (professor.ratingData!!.review_num == 0) {
+                            if (ratingData != null) {
+                                if (ratingData!!.review_num == 0) {
                                     Text("No ratings yet")
                                 } else {
                                     RatingDisplay(
-                                        "Difficulty", professor.ratingData!!.difficulty,
+                                        "Difficulty", ratingData!!.difficulty,
                                         isPercentage = false,
                                         isDifficulty = true
                                     )
@@ -188,7 +194,7 @@ fun ProfessorInformationDisplay(professor: Professor) {
 }
 
 @Composable
-fun BackSearchResultButton(onClick: () -> Unit) {
+fun BackToSearchScreenButton(onClick: () -> Unit) {
     Image(
         painter = painterResource(R.drawable.arrow_back_ios_new_24px),
         contentDescription = "Back",
