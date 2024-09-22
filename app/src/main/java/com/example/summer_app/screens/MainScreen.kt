@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,6 +46,7 @@ import com.example.summer_app.data.SearchInfo
 import com.example.summer_app.data.TermData
 import com.example.summer_app.ui.DashboardHeader
 import com.example.summer_app.ui.DeAnzaCollegeLogo
+import com.example.summer_app.ui.RecentSearchRow
 import com.example.summer_app.ui.SearchBoxGuideText
 import com.example.summer_app.ui.SearchButton
 import com.example.summer_app.ui.SearchInputTextField
@@ -91,9 +94,7 @@ class MainScreen {
     @Composable
     fun SearchInputScreen(context: Context, onEnterLoadingScreen: () -> Unit) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .windowInsetsPadding(WindowInsets.ime),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             var isReadyToSearch by remember { mutableStateOf(searchInfo.isReady()) }
@@ -101,12 +102,13 @@ class MainScreen {
             DashboardHeader()
             SearchBoxGuideText()
 
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 SearchInputTextField {
                     searchInput = it
                     isReadyToSearch = searchInfo.term != null && searchInput.isNotBlank()
                 }
 
+                Spacer(modifier = Modifier.width(20.dp))
                 SearchButton(
                     onClick = {
                         val (searchInput1, searchInput2) = parseCourseInfo(searchInput)
@@ -118,13 +120,18 @@ class MainScreen {
                 )
             }
 
-            TermOptionsRow(
-                context = context,
-                updateChosenTerm = {
-                    searchInfo.term = it
-                    isReadyToSearch = searchInput.isNotBlank()
-                },
-            )
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                TermOptionsRow(
+                    context = context,
+                    updateChosenTerm = {
+                        searchInfo.term = it
+                        isReadyToSearch = searchInput.isNotBlank()
+                    },
+                )
+            }
+
+//            RecentSearchRow()
+
         }
     }
 
@@ -280,6 +287,6 @@ class MainScreen {
     }
 
     companion object {
-        val APP_DEFAULT_FONT = FontFamily(Font(R.font.futura))
+        val APP_DEFAULT_FONT = FontFamily(Font(R.font.lato))
     }
 }
