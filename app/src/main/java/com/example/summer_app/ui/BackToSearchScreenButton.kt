@@ -10,15 +10,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.summer_app.R
-import com.example.summer_app.ui.theme.scheduleGray
-
+import com.example.summer_app.ui.theme.BackToSearchButtonColor
 
 @Composable
 fun BackToSearchScreenButton(onClick: () -> Unit) {
     Image(
         painter = painterResource(R.drawable.arrow_back_ios_new_24px),
         contentDescription = "Back",
-        colorFilter = ColorFilter.tint(scheduleGray),
+        colorFilter = ColorFilter.tint(BackToSearchButtonColor),
         modifier = Modifier
             .size(30.dp)
             .padding(start = 10.dp)

@@ -15,10 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.summer_app.ui.theme.ButtonBackgroundColor
+import com.example.summer_app.ui.theme.SearchIconColorDisabled
+import com.example.summer_app.ui.theme.SearchIconColorEnabled
 
 @Composable
 fun SearchButton(onClick: () -> Unit, enabled: Boolean) {
-    val statusColor = if (enabled) ENABLED_COLOR else DISABLED_COLOR
+    val statusColor = if (enabled) SearchIconColorEnabled else SearchIconColorDisabled
 
     Box(
         modifier = Modifier
@@ -28,7 +31,7 @@ fun SearchButton(onClick: () -> Unit, enabled: Boolean) {
                 clip = false // Make sure the shadow is outside the shape
             )
             .background(
-                color = Color.LightGray, // Background color similar to a button
+                color = ButtonBackgroundColor, // Background color similar to a button
                 shape = RoundedCornerShape(16.dp) // Rounded corners for the box
             )
             .width(80.dp)
@@ -43,6 +46,3 @@ fun SearchButton(onClick: () -> Unit, enabled: Boolean) {
         )
     }
 }
-
-private val DISABLED_COLOR = Color(0xFF969696)
-private val ENABLED_COLOR = Color.DarkGray
