@@ -8,15 +8,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -46,7 +45,6 @@ import com.example.summer_app.data.SearchInfo
 import com.example.summer_app.data.TermData
 import com.example.summer_app.ui.DashboardHeader
 import com.example.summer_app.ui.DeAnzaCollegeLogo
-import com.example.summer_app.ui.RecentSearchRow
 import com.example.summer_app.ui.SearchBoxGuideText
 import com.example.summer_app.ui.SearchButton
 import com.example.summer_app.ui.SearchInputTextField
@@ -72,7 +70,8 @@ class MainScreen {
                 context = context,
                 onEnterLoadingScreen = {
                     screenSection = SEARCH_LOADING
-                })
+                }
+            )
 
             SEARCH_LOADING -> SearchLoadingScreen(
                 context = context,
@@ -81,12 +80,14 @@ class MainScreen {
                 },
                 onBackToSearchScreen = {
                     screenSection = SEARCH_INPUT
-                })
+                }
+            )
 
             SEARCH_RESULT -> ResultScreen(
                 onBackToSearchScreen = {
                     screenSection = SEARCH_INPUT
-                })
+                }
+            )
         }
     }
 
@@ -109,6 +110,7 @@ class MainScreen {
                 }
 
                 Spacer(modifier = Modifier.width(20.dp))
+
                 SearchButton(
                     onClick = {
                         val (searchInput1, searchInput2) = parseCourseInfo(searchInput)
@@ -120,7 +122,8 @@ class MainScreen {
                 )
             }
 
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(Modifier
+                .fillMaxWidth(), contentAlignment = Alignment.Center) {
                 TermOptionsRow(
                     context = context,
                     updateChosenTerm = {

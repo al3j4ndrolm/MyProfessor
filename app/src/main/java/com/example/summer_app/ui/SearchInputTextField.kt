@@ -16,9 +16,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -66,9 +70,15 @@ fun SearchInputTextField(onUpdateInputText: (String) -> Unit) {
             unfocusedIndicatorColor = Color.Transparent,
         ),
         modifier = Modifier
+            .shadow(
+                elevation = 6.dp, // Softer elevation for more natural shadow
+                shape = RoundedCornerShape(14.dp), // Match the shape of the TextField
+                clip = false // Allow the shadow to be drawn outside the shape
+            )
             .width(236.dp)
             .wrapContentHeight() // Adjust height according to the content
-            .background(color = Color(0xFFE8E8E8), shape = RoundedCornerShape(size = 14.dp)),
+            .background(color = Color(0xFFE8E8E8), shape = RoundedCornerShape(size = 14.dp))
+            ,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done
         ),

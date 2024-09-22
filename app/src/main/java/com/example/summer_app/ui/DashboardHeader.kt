@@ -39,7 +39,11 @@ fun DashboardHeader() {
         Row(Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.width(20.dp))
             Box(Modifier
-                .shadow(elevation = 8.dp, spotColor = Color(0x40343434), ambientColor = Color(0x40343434))
+                .shadow(
+                    elevation = 8.dp, // Shadow elevation for natural look
+                    shape = RoundedCornerShape(16.dp), // Rounded corners like a button
+                    clip = false // Make sure the shadow is outside the shape
+                )
                 .width(159.dp)
                 .height(123.dp)
                 .background(color = Color(0xFFE8E8E8),
