@@ -43,6 +43,7 @@ import com.example.summer_app.data.ScreenSection.SEARCH_LOADING
 import com.example.summer_app.data.ScreenSection.SEARCH_RESULT
 import com.example.summer_app.data.SearchInfo
 import com.example.summer_app.data.TermData
+import com.example.summer_app.ui.BackToSearchScreenButton
 import com.example.summer_app.ui.DashboardHeader
 import com.example.summer_app.ui.DeAnzaCollegeLogo
 import com.example.summer_app.ui.SearchBoxGuideText
@@ -181,7 +182,7 @@ class MainScreen {
                         .padding(16.dp),
                 ) {
                     items(professors) { item ->
-                        ProfessorInformationDisplay(
+                        ProfessorCard(
                             dataManager = dataManager,
                             professor = item,
                             department = searchInfo.department
