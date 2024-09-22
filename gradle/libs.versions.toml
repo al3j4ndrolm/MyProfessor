@@ -11,7 +11,6 @@ composeBom = "2023.08.00"
 firebaseDatabaseKtx = "21.0.0"
 volley = "1.2.1"
 playServicesBase = "18.0.1"
-uiTestAndroid = "1.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,7 +30,6 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
-androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
