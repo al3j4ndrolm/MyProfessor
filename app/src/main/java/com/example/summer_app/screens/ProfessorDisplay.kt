@@ -56,7 +56,11 @@ private val scheduleGray = Color(0xFFd1cece)
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ProfessorInformationDisplay(dataManager: DataManager, professor: Professor) {
+fun ProfessorInformationDisplay(
+    dataManager: DataManager,
+    professor: Professor,
+    department: String
+) {
     val context = LocalContext.current
     var ratingData: ProfessorRatingData? by remember { mutableStateOf(professor.ratingData) }
 
@@ -64,6 +68,7 @@ fun ProfessorInformationDisplay(dataManager: DataManager, professor: Professor) 
         dataManager.fetchProfessorRatings(
             context = context,
             professorName = professor.name,
+            department = department,
             onResultReceived = {
                 professor.ratingData = it
                 ratingData = it
@@ -96,7 +101,7 @@ fun ProfessorInformationDisplay(dataManager: DataManager, professor: Professor) 
                                 ) {
                                     append(professor.name)
                                 }
-                                if (ratingData != null){
+                                if (ratingData != null) {
                                     append(" ")
                                     withStyle(
                                         style = SpanStyle(
@@ -132,7 +137,7 @@ fun ProfessorInformationDisplay(dataManager: DataManager, professor: Professor) 
 }
 
 @Composable
-fun ScheduleSection(allSchedules : Map<String, List<String>>) {
+fun ScheduleSection(allSchedules: Map<String, List<String>>) {
     var showSchedule by remember { mutableStateOf(false) }
 
     Divider(

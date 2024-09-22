@@ -69,6 +69,7 @@ class DataManager {
     fun fetchProfessorRatings(
         context: Context,
         professorName: String,
+        department: String,
         onResultReceived: (ProfessorRatingData) -> Unit
     ) {
         if (cachedProfessorRatingData.containsKey(professorName)){
@@ -79,6 +80,7 @@ class DataManager {
         searchProfessorRatings(
             context = context,
             professorName = professorName,
+            department = department,
             onResultReceived = {
                 cachedProfessorRatingData[professorName] = it
                 onResultReceived(it)
