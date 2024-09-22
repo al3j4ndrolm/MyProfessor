@@ -35,7 +35,11 @@ class DataManager {
                             getDurationInSeconds(startTimestamp)
                         )
                     )
-                    onResultReceived(it)
+                    val professors = it.data as List<Professor>
+                    if (it.errorMessage.isBlank()){
+
+                    }
+                    onResultReceived(professors)
                 }
             })
     }

@@ -9,6 +9,7 @@ import com.example.summer_app.data.ProfessorRatingData
 import com.example.summer_app.data.ResponseData
 import com.example.summer_app.data.TermData
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,16 +22,16 @@ internal fun searchProfessors(
     department: String,
     courseCode: String,
     term: String,
-    onResultReceived: (List<Professor>) -> Unit,
+    onResultReceived: (ResponseData) -> Unit,
 ) {
     CoroutineScope(Dispatchers.IO).launch {
         val pyScript = getPythonScript(context = context, scriptName = "ProfessorsFetcher")
         val result = pyScript.callAttr("get_professors_data", department, courseCode, term)
-        val professorsData = toProfessorList(result)
+        val responseData = toResponseWithProfessorList(result)
 
         // Switch back to the main thread to update UI if necessary
         withContext(Dispatchers.Main) {
-            onResultReceived(professorsData)
+            onResultReceived(responseData)
         }
     }
 }
@@ -93,14 +94,20 @@ private fun toTermList(pyObject: PyObject): List<TermData> {
     return termDataList
 }
 
-private fun toProfessorList(pyObject: PyObject): List<Professor> {
+private fun toResponseWithProfessorList(pyObject: PyObject): ResponseData {
     val gson = Gson()
+    val jsonArray = gson.fromJson(pyObject.toString(), JsonArray::class.java)
+
+    if (jsonArray.size() == 1){
+        val error = jsonArray[0]
+        val data : List<Professor> = listOf()
+        return ResponseData(data = data, errorMessage = error.asString)
+    }
 
     val professorsList =
         pyObject.asList().stream().map { gson.fromJson(it.toString(), Professor::class.java) }
             .collect(toList())
-
-    return professorsList
+    return ResponseData(data = professorsList, errorMessage = "")
 }
 
 private fun toResponseWithRatingData(pyObject: PyObject): ResponseData {
