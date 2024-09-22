@@ -50,11 +50,12 @@ internal fun searchAvailableTerms(context: Context, onResultReceived: (List<Term
 internal fun searchProfessorRatings(
     context: Context,
     professorName: String,
+    department: String,
     onResultReceived: (ProfessorRatingData) -> Unit
 ) {
     CoroutineScope(Dispatchers.IO).launch {
         val pyScript = getPythonScript(context = context, scriptName = "RatingsFetcher")
-        val result = pyScript.callAttr("get_ratings", professorName)
+        val result = pyScript.callAttr("get_ratings", professorName, department)
         val ratingData = toRatingsData(result)
 
         // Switch back to the main thread to update UI if necessary
