@@ -1,7 +1,6 @@
 package com.example.summer_app.data
 
 data class ProfessorRatingData(
-    val professor_name: String = "unknown",
     val difficulty: Double = 0.0,
     val would_take_again: Double = 0.0,
     val overall_rating: Double = 0.0,

@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -39,24 +36,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.summer_app.R
 import com.example.summer_app.data.Professor
 import com.example.summer_app.data.ProfessorRatingData
 import com.example.summer_app.ui.ProfessorRatingDisplay
 import com.example.summer_app.ui.ProfessorRatingLoading
+import com.example.summer_app.ui.theme.blue
+import com.example.summer_app.ui.theme.RatingGreen
+import com.example.summer_app.ui.theme.lightGray
+import com.example.summer_app.ui.theme.RatingYellow
+import com.example.summer_app.ui.theme.RatingRed
+import com.example.summer_app.ui.theme.scheduleGray
 import com.example.summer_app.usecase.DataManager
-
-private val lightGray = Color(0xFFedecec)
-private val green = Color(0xFFc2ff72)
-private val red = Color(0xFFd86161)
-private val orange = Color(0xFFf6be6b)
-private val codeOrange = Color(0xFFffbd59)
-private val blue = Color(0xFF83a2f1)
-private val scheduleGray = Color(0xFFd1cece)
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ProfessorInformationDisplay(
+fun ProfessorCard(
     dataManager: DataManager,
     professor: Professor,
     department: String
@@ -89,49 +83,61 @@ fun ProfessorInformationDisplay(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(6.dp)
                 ) {
-
                     Column(Modifier) {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                ) {
-                                    append(professor.name)
-                                }
-                                if (ratingData != null) {
-                                    append(" ")
-                                    withStyle(
-                                        style = SpanStyle(
-                                            color = Color.Gray,
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    ) {
-                                        append("${ratingData!!.review_num} reviews")
-                                    }
-                                }
-                            },
-                            textAlign = TextAlign.Start
+                        ProfessorNameAndReviewsCount(
+                            professorName = professor.name,
+                            ratingData = ratingData,
                         )
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            if (ratingData != null) {
-                                ProfessorRatingDisplay(ratingData!!)
-                            } else {
-                                ProfessorRatingLoading()
-                            }
-                        }
+                        RatingsSection(ratingData = ratingData)
 
-                        ScheduleSection(professor.all_schedules)
+                        ScheduleSection(allSchedules = professor.all_schedules)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ProfessorNameAndReviewsCount(professorName: String, ratingData: ProfessorRatingData?){
+    Text(
+        text = buildAnnotatedString {
+            withStyle(
+                style = SpanStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            ) {
+                append(professorName)
+            }
+            if (ratingData != null) {
+                append(" ")
+                withStyle(
+                    style = SpanStyle(
+                        color = Color.Gray,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append("${ratingData.review_num} reviews")
+                }
+            }
+        },
+        textAlign = TextAlign.Start
+    )
+}
+
+@Composable
+fun RatingsSection(ratingData: ProfessorRatingData?){
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        if (ratingData != null) {
+            ProfessorRatingDisplay(ratingData)
+        } else {
+            ProfessorRatingLoading()
         }
     }
 }
@@ -174,23 +180,9 @@ fun ScheduleSection(allSchedules: Map<String, List<String>>) {
                         }
                     }
                 }
-                DisplayTag(code, color = codeOrange, textColor = Color.Black)
             }
         }
     }
-}
-
-@Composable
-fun BackToSearchScreenButton(onClick: () -> Unit) {
-    Image(
-        painter = painterResource(R.drawable.arrow_back_ios_new_24px),
-        contentDescription = "Back",
-        colorFilter = ColorFilter.tint(scheduleGray),
-        modifier = Modifier
-            .size(30.dp)
-            .padding(start = 10.dp)
-            .clickable { onClick() }
-    )
 }
 
 @Composable
@@ -235,7 +227,6 @@ fun Divider(
 
 @Composable
 fun DisplayTag(value: String, isClassRoom: Boolean = false, color: Color, textColor: Color) {
-
     var text = value
 
     if (isClassRoom) {
@@ -260,7 +251,6 @@ fun DisplayTag(value: String, isClassRoom: Boolean = false, color: Color, textCo
 
 @Composable
 fun RatingDisplay(text: String, value: Double, isPercentage: Boolean, isDifficulty: Boolean) {
-
     if (isPercentage) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -290,21 +280,34 @@ fun RatingDisplay(text: String, value: Double, isPercentage: Boolean, isDifficul
     }
 }
 
+
+@Composable
+fun RatingDot(value: Double, color: Pair<IntRange, Color>) {
+
+    val rangeToColor = listOf(
+        0..10 to RatingRed,
+        11..20 to RatingYellow,
+        21..30 to RatingGreen,
+    )
+
+}
+
+
 @Composable
 fun ValueCircle(value: Double, isDifficulty: Boolean) {
     val color: Color = if (value > 4.0) {
         if (isDifficulty) {
-            red
+            RatingRed
         } else {
-            green
+            RatingGreen
         }
     } else if (value > 3.0) {
-        orange
+        RatingYellow
     } else {
         if (isDifficulty) {
-            green
+            RatingGreen
         } else {
-            red
+            RatingRed
         }
     }
 
@@ -319,11 +322,11 @@ fun ValueCircle(value: Double, isDifficulty: Boolean) {
 @Composable
 fun PercentageCircle(value: Double) {
     val color: Color = if (value > 80.0) {
-        green
+        RatingGreen
     } else if (value > 60.0) {
-        orange
+        RatingYellow
     } else {
-        red
+        RatingRed
     }
 
     Canvas(modifier = Modifier.size(16.dp)) {

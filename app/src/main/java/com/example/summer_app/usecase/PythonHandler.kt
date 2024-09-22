@@ -6,6 +6,7 @@ import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.example.summer_app.data.Professor
 import com.example.summer_app.data.ProfessorRatingData
+import com.example.summer_app.data.ResponseData
 import com.example.summer_app.data.TermData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -51,16 +52,16 @@ internal fun searchProfessorRatings(
     context: Context,
     professorName: String,
     department: String,
-    onResultReceived: (ProfessorRatingData) -> Unit
+    onResultReceived: (ResponseData) -> Unit
 ) {
     CoroutineScope(Dispatchers.IO).launch {
         val pyScript = getPythonScript(context = context, scriptName = "RatingsFetcher")
         val result = pyScript.callAttr("get_ratings", professorName, department)
-        val ratingData = toRatingsData(result)
+        val responseData = toResponseWithRatingData(result)
 
         // Switch back to the main thread to update UI if necessary
         withContext(Dispatchers.Main) {
-            onResultReceived(ratingData)
+            onResultReceived(responseData)
         }
     }
 }
@@ -102,7 +103,11 @@ private fun toProfessorList(pyObject: PyObject): List<Professor> {
     return professorsList
 }
 
-private fun toRatingsData(pyObject: PyObject): ProfessorRatingData {
+private fun toResponseWithRatingData(pyObject: PyObject): ResponseData {
     val gson = Gson()
-    return gson.fromJson(pyObject.toString(), ProfessorRatingData::class.java)
+    val jsonObject = gson.fromJson(pyObject.toString(), JsonObject::class.java)
+
+    return ResponseData(
+        data = gson.fromJson(jsonObject, ProfessorRatingData::class.java),
+        errorMessage =  jsonObject.get("error").asString)
 }

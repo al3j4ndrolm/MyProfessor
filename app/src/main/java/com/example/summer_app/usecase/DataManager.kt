@@ -82,8 +82,11 @@ class DataManager {
             professorName = professorName,
             department = department,
             onResultReceived = {
-                cachedProfessorRatingData[professorName] = it
-                onResultReceived(it)
+                val ratingData = it.data as ProfessorRatingData
+                if (it.errorMessage.isBlank()){
+                    cachedProfessorRatingData[professorName] = ratingData
+                }
+                onResultReceived(ratingData)
             })
     }
 
