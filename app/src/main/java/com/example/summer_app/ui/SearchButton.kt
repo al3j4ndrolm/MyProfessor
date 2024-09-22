@@ -29,7 +29,8 @@ fun SearchButton(onClick: () -> Unit, enabled: Boolean) {
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.LightGray, // Background color
         ),
-        contentPadding = PaddingValues(0.dp)
+        contentPadding = PaddingValues(0.dp),
+        enabled = enabled,
     ) {
         Image(
             painterResource(

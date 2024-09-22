@@ -1,6 +1,0 @@
-{
-  "query": "query NewSearchSchoolsQuery($query: SchoolSearchQuery!) {newSearch {schools(query: $query) {edges {cursor node {id legacyId name city state departments {id name}}}pageInfo {hasNextPage endCursor}}}}",
-  "variables": {
-    "query": {}
-  }
-}
