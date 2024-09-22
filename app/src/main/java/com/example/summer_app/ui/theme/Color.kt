@@ -19,3 +19,12 @@ val RatingYellow = Color(0xFFf6be6b)
 val lightGray = Color(0xFFedecec)
 val blue = Color(0xFF83a2f1)
 val scheduleGray = Color(0xFFd1cece)
+
+// Search button
+val ButtonBackgroundColor = Color.LightGray
+val SearchIconColorEnabled = Color.DarkGray
+val SearchIconColorDisabled = Color(0xFF969696)
+
+// Back to search button
+val BackToSearchButtonColor = scheduleGray
+
