@@ -1,9 +1,12 @@
-package com.example.summer_app
+package com.example.summer_app.usecase
 
 import android.content.Context
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import com.example.summer_app.data.Professor
+import com.example.summer_app.data.ProfessorRatingData
+import com.example.summer_app.data.TermData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.stream.Collectors.toList
 
-fun fetchProfessors(
+internal fun searchProfessors(
     context: Context,
     department: String,
     courseCode: String,
@@ -31,7 +34,7 @@ fun fetchProfessors(
     }
 }
 
-fun fetchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> Unit) {
+internal fun searchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> Unit) {
     CoroutineScope(Dispatchers.IO).launch {
         val pyScript = getPythonScript(context = context, scriptName = "ProfessorsFetcher")
         val result = pyScript.callAttr("get_terms")
@@ -44,7 +47,7 @@ fun fetchAvailableTerms(context: Context, onResultReceived: (List<TermData>) -> 
     }
 }
 
-fun fetchProfessorRatings(
+internal fun searchProfessorRatings(
     context: Context,
     professorName: String,
     onResultReceived: (ProfessorRatingData) -> Unit

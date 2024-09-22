@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.summer_app.screens.MainScreen
 import com.example.summer_app.ui.theme.MyProfessorTheme
 
 class MainActivity : ComponentActivity() {

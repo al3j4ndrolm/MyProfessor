@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.summer_app.MainScreen.Companion.APP_DEFAULT_FONT
+import com.example.summer_app.screens.MainScreen.Companion.APP_DEFAULT_FONT
 
 @Composable
 fun SearchBoxGuideText() {
