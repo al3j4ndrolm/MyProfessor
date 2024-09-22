@@ -65,29 +65,36 @@ def build_schedules(rows, start_row_i):
 
 	columns = rows[start_row_i].find_all('td')
 	schedule = build_schedule(columns = columns, days_col = 5, hours_col = 6, location_col = 8)
-	schedules.append(schedule)
+	schedules.append(format_schedule(schedule))
 
 	following_row_i = start_row_i + 1
 	while following_row_i < len(rows):
 		columns_for_following_row = rows[following_row_i].find_all('td')
 		if len(columns_for_following_row) < 7:
 			schedule = build_schedule(columns = columns_for_following_row, days_col = 1, hours_col = 2, location_col = 4)
-			schedules.append(schedule)
+			if schedule:
+				schedules.append(schedule)
 			following_row_i += 1
 		else:
 			break
 
 	return schedules
 
-def build_schedule(columns, days_col, hours_col, location_col):
-	days_in_week = get_days(columns[days_col].text)
-	hours = columns[hours_col].text
-	location = columns[location_col].text
-	schedule = f"{days_in_week} - {hours}/{location}"
-	if not "TBA" in schedule:
+def format_schedule(schedule):
+	if schedule:
 		return schedule
 	else:
 		return "No schedule/ONLINE"
+
+def build_schedule(columns, days_col, hours_col, location_col):
+	days_in_week = get_days(columns[days_col].text)
+	hours = columns[hours_col].text
+	if "TBA" in hours:
+		return None
+	else:
+		location = columns[location_col].text
+		schedule = f"{days_in_week} - {hours}/{location}"
+		return schedule
 
 def convert_name(name):
 	parts = name.split(',')

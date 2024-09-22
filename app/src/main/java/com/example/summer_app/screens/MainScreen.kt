@@ -97,12 +97,15 @@ class MainScreen {
                 .windowInsetsPadding(WindowInsets.ime),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            var isReadyToSearch by remember { mutableStateOf(searchInfo.isReady()) }
+
             DashboardHeader()
             SearchBoxGuideText()
 
             Row {
                 SearchInputTextField {
                     searchInput = it
+                    isReadyToSearch = searchInfo.term != null && searchInput.isNotBlank()
                 }
 
                 SearchButton(
@@ -112,7 +115,7 @@ class MainScreen {
                         searchInfo.courseCode = searchInput2
                         onEnterLoadingScreen()
                     },
-                    enabled = searchInfo.isReady()
+                    enabled = isReadyToSearch
                 )
             }
 
@@ -120,6 +123,7 @@ class MainScreen {
                 context = context,
                 updateChosenTerm = {
                     searchInfo.term = it
+                    isReadyToSearch = searchInput.isNotBlank()
                 },
             )
         }
