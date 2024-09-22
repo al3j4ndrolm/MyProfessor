@@ -106,8 +106,10 @@ private fun toProfessorList(pyObject: PyObject): List<Professor> {
 private fun toResponseWithRatingData(pyObject: PyObject): ResponseData {
     val gson = Gson()
     val jsonObject = gson.fromJson(pyObject.toString(), JsonObject::class.java)
+    val error = jsonObject.get("error")
+    val errorMessage = if (error != null) error.asString else ""
 
     return ResponseData(
         data = gson.fromJson(jsonObject, ProfessorRatingData::class.java),
-        errorMessage =  jsonObject.get("error").asString)
+        errorMessage =  errorMessage)
 }
