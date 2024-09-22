@@ -1,6 +1,8 @@
 package com.example.summer_app.ui
 
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,12 +15,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.example.summer_app.screens.MainScreen.Companion.APP_DEFAULT_FONT
+import androidx.compose.ui.unit.sp
+import com.example.summer_app.R
 
 @Composable
 fun SearchInputTextField(onUpdateInputText: (String) -> Unit) {
@@ -31,35 +39,39 @@ fun SearchInputTextField(onUpdateInputText: (String) -> Unit) {
             inputText = newText
             onUpdateInputText(newText)
         },
-        label = {
+        placeholder = {
             Text(
-                "Enter CLASS and CODE",
-                fontFamily = APP_DEFAULT_FONT
+                text = "ex. MATH 1A",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 30.sp,
+                    fontFamily = FontFamily(Font(R.font.lato)),
+                    fontWeight = FontWeight(400),
+                    fontStyle = FontStyle.Italic,
+                    color = Color(0xFFA4A4A4),
+                )
             )
         },
-        shape = RoundedCornerShape(
-            topStart = 16.dp,
-            topEnd = 0.dp,
-            bottomEnd = 0.dp,
-            bottomStart = 16.dp
-        ),
+        shape = RoundedCornerShape(32.dp),
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color.Black,
             unfocusedTextColor = Color.Gray,
-            focusedContainerColor = Color.LightGray,
-            unfocusedContainerColor = Color.LightGray,
+            focusedContainerColor = Color(0xFFE8E8E8),
+            unfocusedContainerColor = Color(0xFFE8E8E8),
             disabledContainerColor = Color.LightGray,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         ),
         modifier = Modifier
-            .height(56.dp)
-            .onFocusChanged {
-                // Clear focus when focus is lost or on some condition
-                if (!it.isFocused) {
-                    focusManager.clearFocus()
-                }
-            },
+            .shadow(
+                elevation = 6.dp, // Softer elevation for more natural shadow
+                shape = RoundedCornerShape(14.dp), // Match the shape of the TextField
+                clip = false // Allow the shadow to be drawn outside the shape
+            )
+            .width(236.dp)
+            .wrapContentHeight() // Adjust height according to the content
+            .background(color = Color(0xFFE8E8E8), shape = RoundedCornerShape(size = 14.dp))
+            ,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done
         ),
