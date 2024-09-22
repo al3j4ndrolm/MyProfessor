@@ -2,19 +2,15 @@ package com.example.summer_app.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,7 +35,11 @@ fun DashboardHeader() {
         Row(Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.width(20.dp))
             Box(Modifier
-                .shadow(elevation = 8.dp, spotColor = Color(0x40343434), ambientColor = Color(0x40343434))
+                .shadow(
+                    elevation = 8.dp, // Shadow elevation for natural look
+                    shape = RoundedCornerShape(16.dp), // Rounded corners like a button
+                    clip = false // Make sure the shadow is outside the shape
+                )
                 .width(159.dp)
                 .height(123.dp)
                 .background(color = Color(0xFFE8E8E8),
@@ -47,7 +47,7 @@ fun DashboardHeader() {
                 ),
                 contentAlignment = Alignment.BottomCenter
             ){
-                Box(){
+                Box{
                     Row(modifier = Modifier
                         .padding(start = 58.dp,bottom = 33.dp)) {
                         Box(modifier = Modifier

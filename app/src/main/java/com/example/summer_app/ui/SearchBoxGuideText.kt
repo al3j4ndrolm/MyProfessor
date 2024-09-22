@@ -16,7 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.summer_app.R
-import com.example.summer_app.screens.MainScreen.Companion.APP_DEFAULT_FONT
 
 @Composable
 fun SearchBoxGuideText() {

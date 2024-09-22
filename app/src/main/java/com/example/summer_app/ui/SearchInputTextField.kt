@@ -1,7 +1,6 @@
 package com.example.summer_app.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -29,7 +27,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.summer_app.R
-import com.example.summer_app.screens.MainScreen.Companion.APP_DEFAULT_FONT
 
 @Composable
 fun SearchInputTextField(onUpdateInputText: (String) -> Unit) {
@@ -66,9 +63,15 @@ fun SearchInputTextField(onUpdateInputText: (String) -> Unit) {
             unfocusedIndicatorColor = Color.Transparent,
         ),
         modifier = Modifier
+            .shadow(
+                elevation = 6.dp, // Softer elevation for more natural shadow
+                shape = RoundedCornerShape(14.dp), // Match the shape of the TextField
+                clip = false // Allow the shadow to be drawn outside the shape
+            )
             .width(236.dp)
             .wrapContentHeight() // Adjust height according to the content
-            .background(color = Color(0xFFE8E8E8), shape = RoundedCornerShape(size = 14.dp)),
+            .background(color = Color(0xFFE8E8E8), shape = RoundedCornerShape(size = 14.dp))
+            ,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done
         ),
