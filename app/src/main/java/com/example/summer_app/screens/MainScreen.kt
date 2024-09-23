@@ -3,18 +3,26 @@ package com.example.summer_app.screens
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
@@ -43,7 +53,6 @@ import com.example.summer_app.data.ScreenSection.SEARCH_LOADING
 import com.example.summer_app.data.ScreenSection.SEARCH_RESULT
 import com.example.summer_app.data.SearchInfo
 import com.example.summer_app.data.TermData
-import com.example.summer_app.ui.BackToSearchScreenButton
 import com.example.summer_app.ui.DashboardHeader
 import com.example.summer_app.ui.DeAnzaCollegeLogo
 import com.example.summer_app.ui.SearchBoxGuideText
@@ -52,6 +61,7 @@ import com.example.summer_app.ui.SearchInputTextField
 import com.example.summer_app.ui.SearchLoadingScene
 import com.example.summer_app.ui.Snackbar
 import com.example.summer_app.ui.TermButtons
+import com.example.summer_app.ui.theme.selectObjectGray
 import com.example.summer_app.usecase.DataManager
 import com.example.summer_app.usecase.parseInputString
 import java.util.stream.Collectors.toList
@@ -184,7 +194,7 @@ class MainScreen {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(0.dp),
                 ) {
                     items(professors) { item ->
                         ProfessorCard(
@@ -242,45 +252,107 @@ class MainScreen {
     fun SearchResultHeader(
         onClickBackButton: () -> Unit = {}
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp, top = 50.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BackToSearchScreenButton(onClick = {
-                onClickBackButton()
-            })
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(Modifier
+                .shadow(
+                    elevation = 6.dp, // Softer elevation for more natural shadow
+                    shape = RoundedCornerShape(14.dp), // Match the shape of the TextField
+                    clip = false // Allow the shadow to be drawn outside the shape
+                )
+                .width(340.dp)
+                .height(153.dp)
+                .background(color = Color(0xFFE8E8E8), shape = RoundedCornerShape(bottomStart = 14.dp, bottomEnd = 14.dp))){
 
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold)) {
-                        append("${searchInfo.department} ${searchInfo.courseCode}\n")
+                Column {
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
+                        Row(Modifier.padding(start = 5.dp,top = 40.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Filled.ArrowBack,
+                                contentDescription = "",
+                                modifier = Modifier.clickable { onClickBackButton() },
+                                tint = selectObjectGray
+                            )
+                            ballsRow()
+                        }
                     }
-                    withStyle(
-                        style = SpanStyle(
-                            color = Color.Gray,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Light
-                        )
+                    Box(
+                        Modifier.fillMaxHeight(),
+                        contentAlignment = Alignment.CenterStart
                     ) {
-                        append(searchInfo.term!!.termText)
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontSize = 32.sp,
+                                        fontWeight = FontWeight(700),
+                                        color = Color(0xFF000000)
+                                    )
+                                ) {
+                                    append("${searchInfo.department} ${searchInfo.courseCode}\n")
+//                                    append("TEST MODE\n")
+                                }
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontSize = 20.sp, // Smaller font size for "Fall 2024"
+                                        fontWeight = FontWeight(400), // Lighter weight for "Fall 2024"
+                                        color = Color(0xFF888888) // Lighter color
+                                    )
+                                ) {
+                                    append(searchInfo.term!!.termText) // Smaller and lighter "Fall 2024"
+//                                    append("Testing") // Smaller and lighter "Fall 2024"
+
+                                }
+                            },
+                            lineHeight = 30.sp,
+                            fontFamily = APP_DEFAULT_FONT,
+                            modifier = Modifier.padding(start = 10.dp)
+                        )
                     }
-                },
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-            )
-            androidx.compose.material3.Divider(
-                modifier = Modifier
-                    .height(64.dp) // Height of the divider
-                    .width(2.dp), // Width (thickness) of the divider
-                color = Color.Black // Customize the color as needed
-            )
-            DeAnzaCollegeLogo()
+                }
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomEnd) {
+                    Image(
+                        painter = painterResource(R.drawable.dac_logo_black),
+                        "De Anza College Logo",
+                        modifier = Modifier
+                            .width(124.dp)
+                            .height(63.dp)
+                            .padding(
+                                end = 20.dp
+                            )
+                    )
+                }
+            }
         }
     }
 
     companion object {
         val APP_DEFAULT_FONT = FontFamily(Font(R.font.lato))
+    }
+
+    @Composable
+    fun ballsRow() {
+        Row(modifier = Modifier
+            .padding(start = 5.dp)) {
+            Box(modifier = Modifier
+                .padding(3.dp)
+                .width(16.dp)
+                .height(16.dp)
+                .background(color = Color(0xFFC1FF72), shape = RoundedCornerShape(10.dp))
+            )
+            Box(modifier = Modifier
+                .padding(3.dp)
+                .width(16.dp)
+                .height(16.dp)
+                .background(color = Color(0xFFFFBD59), shape = RoundedCornerShape(10.dp))
+            )
+            Box(modifier = Modifier
+                .padding(3.dp)
+                .width(16.dp)
+                .height(16.dp)
+                .background(color = Color(0xFFD86161), shape = RoundedCornerShape(10.dp))
+            )
+        }
     }
 }

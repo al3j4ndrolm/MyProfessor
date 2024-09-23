@@ -47,27 +47,7 @@ fun DashboardHeader() {
                 contentAlignment = Alignment.BottomCenter
             ){
                 Box{
-                    Row(modifier = Modifier
-                        .padding(start = 58.dp,bottom = 33.dp)) {
-                        Box(modifier = Modifier
-                            .padding(3.dp)
-                            .width(16.dp)
-                            .height(16.dp)
-                            .background(color = Color(0xFFC1FF72), shape = RoundedCornerShape(10.dp))
-                        )
-                        Box(modifier = Modifier
-                            .padding(3.dp)
-                            .width(16.dp)
-                            .height(16.dp)
-                            .background(color = Color(0xFFFFBD59), shape = RoundedCornerShape(10.dp))
-                        )
-                        Box(modifier = Modifier
-                            .padding(3.dp)
-                            .width(16.dp)
-                            .height(16.dp)
-                            .background(color = Color(0xFFD86161), shape = RoundedCornerShape(10.dp))
-                        )
-                    }
+                    ballsRow()
                 }
                 Text(
                     text = "My\nProfessor",
@@ -90,5 +70,30 @@ fun DashboardHeader() {
                     .width(150.dp)
             )
         }
+    }
+}
+
+@Composable
+fun ballsRow() {
+    Row(modifier = Modifier
+        .padding(start = 58.dp,bottom = 33.dp)) {
+        Box(modifier = Modifier
+            .padding(3.dp)
+            .width(16.dp)
+            .height(16.dp)
+            .background(color = Color(0xFFC1FF72), shape = RoundedCornerShape(10.dp))
+        )
+        Box(modifier = Modifier
+            .padding(3.dp)
+            .width(16.dp)
+            .height(16.dp)
+            .background(color = Color(0xFFFFBD59), shape = RoundedCornerShape(10.dp))
+        )
+        Box(modifier = Modifier
+            .padding(3.dp)
+            .width(16.dp)
+            .height(16.dp)
+            .background(color = Color(0xFFD86161), shape = RoundedCornerShape(10.dp))
+        )
     }
 }

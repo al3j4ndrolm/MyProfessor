@@ -15,14 +15,16 @@ val Pink40 = Color(0xFF7D5260)
 val RatingGreen = Color(0xFFc2ff72)
 val RatingRed = Color(0xFFd86161)
 val RatingYellow = Color(0xFFf6be6b)
+val blue = Color(0xFF83a2f1)
 
 val lightGray = Color(0xFFedecec)
-val blue = Color(0xFF83a2f1)
 val scheduleGray = Color(0xFFd1cece)
+val selectObjectGray = Color(0xFF616161)
+val textGray = Color(0xFFa4a4a4)
 
 // Search button
-val ButtonBackgroundColor = Color.LightGray
-val SearchIconColorEnabled = Color.DarkGray
+val ButtonBackgroundColor = scheduleGray
+val SearchIconColorEnabled = selectObjectGray
 val SearchIconColorDisabled = Color(0xFF969696)
 
 // Back to search button
