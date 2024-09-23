@@ -1,6 +1,5 @@
 package com.example.summer_app.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,8 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -25,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.summer_app.R
+import com.example.summer_app.ui.theme.DashboardHeaderBackground
+import com.example.summer_app.ui.theme.DashboardHeaderTextColor
 
 @Composable
 fun DashboardHeader() {
@@ -41,13 +40,13 @@ fun DashboardHeader() {
                 )
                 .width(159.dp)
                 .height(123.dp)
-                .background(color = Color(0xFFE8E8E8),
+                .background(color = DashboardHeaderBackground,
                     shape = RoundedCornerShape( bottomStart = 14.dp, bottomEnd = 14.dp)
                 ),
                 contentAlignment = Alignment.BottomCenter
             ){
-                Box{
-                    ballsRow()
+                Box(modifier = Modifier.padding(start = 60.dp, bottom = 40.dp)){
+                    ThreeBallsLogo()
                 }
                 Text(
                     text = "My\nProfessor",
@@ -56,44 +55,15 @@ fun DashboardHeader() {
                         lineHeight = 30.sp,
                         fontFamily = FontFamily(Font(R.font.lato)),
                         fontWeight = FontWeight(600),
-                        color = Color(0xFF000000),
+                        color = DashboardHeaderTextColor,
                     ),
-                    modifier = Modifier
-                        .padding(bottom = 5.dp)
+                    modifier = Modifier.padding(bottom = 5.dp)
                 )
             }
             Spacer(Modifier.width(28.dp))
-            Image(
-                painter = painterResource(id = R.drawable.dac_logo_black), contentDescription = "Logo",
-                modifier = Modifier
-                    .padding(top = 47.dp)
-                    .width(150.dp)
-            )
+            Box(modifier = Modifier.padding(top = 50.dp)){
+                DeAnzaCollegeLogoBig()
+            }
         }
-    }
-}
-
-@Composable
-fun ballsRow() {
-    Row(modifier = Modifier
-        .padding(start = 58.dp,bottom = 33.dp)) {
-        Box(modifier = Modifier
-            .padding(3.dp)
-            .width(16.dp)
-            .height(16.dp)
-            .background(color = Color(0xFFC1FF72), shape = RoundedCornerShape(10.dp))
-        )
-        Box(modifier = Modifier
-            .padding(3.dp)
-            .width(16.dp)
-            .height(16.dp)
-            .background(color = Color(0xFFFFBD59), shape = RoundedCornerShape(10.dp))
-        )
-        Box(modifier = Modifier
-            .padding(3.dp)
-            .width(16.dp)
-            .height(16.dp)
-            .background(color = Color(0xFFD86161), shape = RoundedCornerShape(10.dp))
-        )
     }
 }

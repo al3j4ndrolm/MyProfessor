@@ -4,17 +4,11 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -26,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -38,10 +31,11 @@ import androidx.compose.ui.unit.sp
 import com.example.summer_app.data.Professor
 import com.example.summer_app.data.ProfessorRatingData
 import com.example.summer_app.ui.ProfessorRatingDisplay
-import com.example.summer_app.ui.theme.RatingYellow
-import com.example.summer_app.ui.theme.blue
-import com.example.summer_app.ui.theme.lightGray
-import com.example.summer_app.ui.theme.scheduleGray
+import com.example.summer_app.ui.RatingStillFetchingDisplay
+import com.example.summer_app.ui.RatingsSection
+import com.example.summer_app.ui.ScheduleSection
+import com.example.summer_app.ui.theme.ProfessorCardBackground
+import com.example.summer_app.ui.theme.ProfessorReviewCount
 import com.example.summer_app.usecase.DataManager
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -52,9 +46,7 @@ fun ProfessorCard(
     department: String
 ) {
     val context = LocalContext.current
-    var showSchedule by remember { mutableStateOf(false) }
     var ratingData: ProfessorRatingData? by remember { mutableStateOf(professor.ratingData) }
-//    var ratingData: ProfessorRatingData = ProfessorRatingData()
 
     LaunchedEffect(Unit) {
         dataManager.fetchProfessorRatings(
@@ -70,7 +62,7 @@ fun ProfessorCard(
 
     Box(
         modifier = Modifier
-            .padding(end = 8.dp, top = 5.dp, bottom = 8.dp)
+            .padding(end = 8.dp, top = 8.dp)
             .wrapContentHeight()
             .animateContentSize()
     ) {
@@ -82,35 +74,12 @@ fun ProfessorCard(
                     modifier = Modifier.padding()
                 ) {
                     Column(Modifier) {
-                        ProfessorNameAndReviewsCount(
+                        ProfessorNameAndReviewCount(
                             professorName = professor.name,
                             ratingData = ratingData,
                         )
-
                         RatingsSection(ratingData = ratingData)
-
-                        Box(modifier = Modifier
-                            .clickable(onClick = { showSchedule = !showSchedule }, indication = null, interactionSource = remember { MutableInteractionSource() } )
-                            .padding(top = 5.dp)
-                            .background(lightGray, RoundedCornerShape(bottomEnd = 14.dp, topEnd = 14.dp))
-                            .defaultMinSize(minWidth = 200.dp, minHeight = 30.dp)
-                            .wrapContentHeight()
-                            .animateContentSize(),
-                            contentAlignment = Alignment.CenterStart
-                        )
-
-                        {
-
-                            if (professor.all_schedules.isNotEmpty() && showSchedule){
-                                ScheduleSection(allSchedules = professor.all_schedules, showSchedule = showSchedule)
-                            } else {
-                                Text("Schedule",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 5.dp),
-                                    color = Color.Gray)
-                            }
-                        }
+                        ScheduleSection(allSchedules = professor.all_schedules)
                     }
                 }
             }
@@ -119,12 +88,12 @@ fun ProfessorCard(
 }
 
 @Composable
-fun ProfessorNameAndReviewsCount(professorName: String, ratingData: ProfessorRatingData?){
+private fun ProfessorNameAndReviewCount(professorName: String, ratingData: ProfessorRatingData?) {
     Text(
         text = buildAnnotatedString {
             withStyle(
                 style = SpanStyle(
-                    fontSize = 20.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
             ) {
@@ -134,8 +103,8 @@ fun ProfessorNameAndReviewsCount(professorName: String, ratingData: ProfessorRat
                 append(" ")
                 withStyle(
                     style = SpanStyle(
-                        color = Color.Gray,
-                        fontSize = 10.sp,
+                        color = ProfessorReviewCount,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
                 ) {
@@ -148,167 +117,5 @@ fun ProfessorNameAndReviewsCount(professorName: String, ratingData: ProfessorRat
     )
 }
 
-@Composable
-fun RatingsSection(ratingData: ProfessorRatingData?){
-
-    Row(Modifier.fillMaxWidth()
-    ) {
-        if (ratingData != null) {
-            ProfessorRatingDisplay(ratingData, dataReady = true)
-        } else {
-            ProfessorRatingDisplay()
-        }
-    }
-}
 
 
-@Composable
-fun ScheduleSection(allSchedules: Map<String, List<String>>, showSchedule: Boolean = false) {
-    var showSchedule by remember { mutableStateOf(showSchedule) }
-
-    if (showSchedule) {
-        for ((code, schedules) in allSchedules) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column {
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 15.dp, top = 8.dp)
-                            .background(color = RatingYellow, shape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp, bottomEnd = 14.dp)),
-
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            code, fontSize = 12.sp,
-                            modifier = Modifier
-                                .padding(top = 2.dp, bottom = 2.dp, start = 8.dp, end = 8.dp),
-                            color = Color.Black, fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 5.dp, bottom = 8.dp, end = 10.dp)
-                            .background(scheduleGray, RoundedCornerShape(12.dp))
-                    ) {
-                        Column {
-                            for (schedule in schedules) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                                    Text(
-                                        text = schedule.substringBefore("/"),
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(5.dp)
-                                    )
-                                    DisplayTag(
-                                        schedule,
-                                        isClassRoom = true,
-                                        color = blue,
-                                        textColor = Color.White
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun DisplayTag(value: String, isClassRoom: Boolean = false, color: Color, textColor: Color) {
-    var text = value
-
-    if (isClassRoom) {
-        text = value.substringAfter("/")
-    }
-
-    Box(
-        modifier = Modifier
-            .background(color = color, shape = RoundedCornerShape(10.dp))
-            .padding(start = 3.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text, fontSize = 12.sp,
-            modifier = Modifier
-                .padding(top = 2.dp, bottom = 2.dp, start = 8.dp, end = 8.dp),
-            color = textColor, fontWeight = FontWeight.Bold
-        )
-    }
-    Spacer(modifier = Modifier.width(4.dp))
-}
-
-//@Composable
-//fun RatingDisplay(text: String, value: Double, isPercentage: Boolean, isDifficulty: Boolean) {
-//    if (isPercentage) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            modifier = Modifier.padding(bottom = 6.dp)
-//        ) {
-//            PercentageCircle(value)
-//            Text(
-//                text = "$text: ${value.toInt()} %",
-//                fontSize = 14.sp,
-//                modifier = Modifier.padding(start = 4.dp)
-//            )
-//        }
-//    } else {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            modifier = Modifier.padding(bottom = 6.dp)
-//        ) {
-//            ValueCircle(value, isDifficulty)
-//            Text(
-//                text = "$text: $value",
-//                fontSize = 14.sp,
-//                modifier = Modifier.padding(start = 4.dp)
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//fun ValueCircle(value: Double, isDifficulty: Boolean) {
-//    val color: Color = if (value > 4.0) {
-//        if (isDifficulty) {
-//            RatingRed
-//        } else {
-//            RatingGreen
-//        }
-//    } else if (value > 3.0) {
-//        RatingYellow
-//    } else {
-//        if (isDifficulty) {
-//            RatingGreen
-//        } else {
-//            RatingRed
-//        }
-//    }
-//
-//    Canvas(modifier = Modifier.size(16.dp)) {
-//        drawCircle(
-//            color = color, // Circle color
-//            radius = size.minDimension / 2 // Radius of the circle
-//        )
-//    }
-//}
-//
-//@Composable
-//fun PercentageCircle(value: Double) {
-//    val color: Color = if (value > 80.0) {
-//        RatingGreen
-//    } else if (value > 60.0) {
-//        RatingYellow
-//    } else {
-//        RatingRed
-//    }
-//
-//    Canvas(modifier = Modifier.size(16.dp)) {
-//        drawCircle(
-//            color = color,
-//            radius = size.minDimension / 2
-//        )
-//    }
-//}

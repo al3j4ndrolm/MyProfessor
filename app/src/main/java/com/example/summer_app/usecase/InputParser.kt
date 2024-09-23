@@ -5,8 +5,8 @@ fun parseInputString(searchInput: String): Pair<String, String>? {
 
     val index = input.indexOfFirst { it.isDigit() }
     if (index > 1){
-        val department = input.substring(0, index).uppercase()
-        val code = input.substring(index).uppercase()
+        val department = input.substring(0, index).uppercase().trimEnd()
+        val code = input.substring(index).uppercase().trimEnd()
         return Pair(department, code)
     }
     return null
