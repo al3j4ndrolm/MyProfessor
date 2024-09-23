@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.summer_app.screens.MainScreen.Companion.APP_DEFAULT_FONT
+import com.example.summer_app.ui.theme.SearchLoadingTextColor
 
 @Composable
 fun SearchLoadingScene() {
@@ -30,7 +31,8 @@ fun SearchLoadingScene() {
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = APP_DEFAULT_FONT,
-                color = Color.LightGray
+                color = SearchLoadingTextColor,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
     }

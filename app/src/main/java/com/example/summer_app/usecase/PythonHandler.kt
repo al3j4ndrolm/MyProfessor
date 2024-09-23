@@ -96,13 +96,14 @@ private fun toTermList(pyObject: PyObject): List<TermData> {
 
 private fun toResponseWithProfessorList(pyObject: PyObject): ResponseData {
     val gson = Gson()
-    val jsonArray = gson.fromJson(pyObject.toString(), JsonArray::class.java)
-
-    if (jsonArray.size() == 1){
-        val error = jsonArray[0]
-        val data : List<Professor> = listOf()
-        return ResponseData(data = data, errorMessage = error.asString)
-    }
+//    val jsonArray = gson.fromJson(pyObject.toString(), JsonArray::class.java)
+//
+//    if (jsonArray.size() == 1){
+//        val error = jsonArray[0]
+//        val data : List<Professor> = listOf()
+//        println(String.format("error: %s", error))
+//        return ResponseData(data = data, errorMessage = error.asString)
+//    }
 
     val professorsList =
         pyObject.asList().stream().map { gson.fromJson(it.toString(), Professor::class.java) }
