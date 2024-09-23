@@ -23,13 +23,19 @@ def get_terms():
 
 def get_professors_data(department_code, coruse_code, term_code):
 	print(f"ProfessorsFetcher: Received call get_professors_data({department_code}, {coruse_code}, {term_code}).")
-	soup = HttpUtil.get_soup(url = f'https://www.deanza.edu/schedule/listings.html?dept={department_code}&t={term_code}')
-	table = soup.find_all('table', 'table table-schedule table-hover mix-container')[0]
-	rows = table.find_all('tr')
+	try:
+		soup = HttpUtil.get_soup(url = f'https://www.deanza.edu/schedule/listings.html?dept={department_code}&t={term_code}')
+		result = soup.find_all('table', 'table table-schedule table-hover mix-container')
+		if len(result) == 0:
+			return ["shilabens"]
 
-	professor_table = build_professor_table(rows, department_code + " " + coruse_code)
-	print(f"ProfessorsFetcher: Returning professor data of get_professors_data(...) to client.")
-	return list(professor_table.values())
+		table = result[0]
+		rows = table.find_all('tr')
+		professor_table = build_professor_table(rows, department_code + " " + coruse_code)
+		print(f"ProfessorsFetcher: Returning professor data of get_professors_data(...) to client.")
+		return list(professor_table.values())
+	except:
+		return ["shilabens"]
 
 ######################## Exported to be used in kotlin ########################
 
@@ -110,6 +116,6 @@ def get_days(input):
 	return input.replace("·", "")
 
 if __name__ == "__main__":
-	print(get_professors_data(department_code = "MATH", coruse_code = "1A", term_code = "F2024"))
+	print(get_professors_data(department_code = "aa", coruse_code = "", term_code = "F2024"))
 	# print(get_professors_data(department_code = "PHYS", coruse_code = "2A", term_code = "F2024"))
 	# print(get_terms())

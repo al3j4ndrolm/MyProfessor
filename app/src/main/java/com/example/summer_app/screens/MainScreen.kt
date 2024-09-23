@@ -50,8 +50,10 @@ import com.example.summer_app.ui.SearchBoxGuideText
 import com.example.summer_app.ui.SearchButton
 import com.example.summer_app.ui.SearchInputTextField
 import com.example.summer_app.ui.SearchLoadingScene
+import com.example.summer_app.ui.Snackbar
 import com.example.summer_app.ui.TermButtons
 import com.example.summer_app.usecase.DataManager
+import com.example.summer_app.usecase.parseInputString
 import java.util.stream.Collectors.toList
 
 class MainScreen {
@@ -113,10 +115,16 @@ class MainScreen {
 
                 SearchButton(
                     onClick = {
-                        val (searchInput1, searchInput2) = parseCourseInfo(searchInput)
-                        searchInfo.department = searchInput1
-                        searchInfo.courseCode = searchInput2
-                        onEnterLoadingScreen()
+                        val parsedInput = parseInputString(searchInput)
+                        println(String.format("parsed input: %s", parsedInput))
+                        if (parsedInput != null) {
+                            val (searchInput1, searchInput2) = parsedInput
+                            searchInfo.department = searchInput1
+                            searchInfo.courseCode = searchInput2
+                            onEnterLoadingScreen()
+                        } else {
+                            // Error handle
+                        }
                     },
                     enabled = isReadyToSearch
                 )
@@ -132,9 +140,6 @@ class MainScreen {
                     },
                 )
             }
-
-//            RecentSearchRow()
-
         }
     }
 
@@ -273,20 +278,6 @@ class MainScreen {
             )
             DeAnzaCollegeLogo()
         }
-    }
-
-    private fun parseCourseInfo(searchInput: String): Pair<String, String> {
-        val input = searchInput.trimEnd()
-        val partsBySpace = input.split(" ", limit = 2)
-        val parts = if (partsBySpace.size == 2) {
-            partsBySpace
-        } else {
-            val index = input.indexOfFirst { it.isDigit() }
-            listOf(input.substring(0, index - 1), input.substring(index))
-        }
-        val department = parts.getOrElse(0) { "" }.uppercase()
-        val code = parts.getOrElse(1) { "" }.uppercase()
-        return Pair(department, code)
     }
 
     companion object {
