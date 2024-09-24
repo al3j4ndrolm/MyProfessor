@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.MyProfessor"
+    namespace = "com.bizarrdev.MyProfessor"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.MyProfessor"
+        applicationId = "com.bizarrdev.MyProfessor"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -25,6 +25,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            keyAlias = "AppUpdatesKey"
+            keyPassword = "29630954"
+            storeFile = file("C:/Users/cheny/Desktop/MyProfessorAppKey.jks")
+            storePassword = "29630954"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -34,24 +43,30 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     buildToolsVersion = "34.0.0"
 }
 
@@ -64,7 +79,7 @@ buildscript {
         maven(url = "https://chaquo.com/maven")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.0.0")
+        classpath("com.android.tools.build:gradle:8.6.0")
         classpath("com.chaquo.python:gradle:15.0.1")
     }
 }
