@@ -4,6 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -14,13 +17,10 @@ import com.bizarrdev.MyProfessor.ui.theme.BackToSearchButtonColor
 
 @Composable
 fun BackToSearchScreenButton(onClick: () -> Unit) {
-    Image(
-        painter = painterResource(R.drawable.arrow_back_ios_new_24px),
-        contentDescription = "Back",
-        colorFilter = ColorFilter.tint(BackToSearchButtonColor),
-        modifier = Modifier
-            .size(30.dp)
-            .padding(start = 10.dp)
-            .clickable { onClick() }
+    Icon(
+        Icons.Filled.ArrowBack,
+        contentDescription = "",
+        modifier = Modifier.clickable { onClick() },
+        tint = BackToSearchButtonColor
     )
 }

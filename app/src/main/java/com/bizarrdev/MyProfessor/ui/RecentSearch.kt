@@ -1,10 +1,15 @@
 package com.bizarrdev.MyProfessor.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,61 +23,63 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bizarrdev.MyProfessor.R
+import com.bizarrdev.MyProfessor.data.SearchInfo
+import com.bizarrdev.MyProfessor.ui.theme.APP_DEFAULT_FONT
+import com.bizarrdev.MyProfessor.ui.theme.RecentSearchLabel
+import com.bizarrdev.MyProfessor.ui.theme.RecentSearchTextColor
+import com.bizarrdev.MyProfessor.usecase.DataManager
 
 @Composable
-fun RecentSearchRow() {
-    val recentSearches = listOf("MATH 1A", "MATH 210X", "MATH 220C")
-    RecentSearchText()
+fun RecentSearchRow(recentSearch: List<SearchInfo>, onClick: (SearchInfo) -> Unit) {
+    if (recentSearch.isNotEmpty()) {
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            RecentSearchText()
 
-    if (recentSearches.isEmpty()) {
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            RecentSearchText("No recent searches")
-        }
-    }
-    Row(Modifier.padding(start = 20.dp, top = 10.dp)) {
-
-        for (search in recentSearches) {
-            RecentSearchItem(search = search)
+            Row(Modifier.fillMaxWidth().padding(top = 10.dp)) {
+                for (searchInfo in recentSearch) {
+                    RecentSearchItem(searchInfo = searchInfo, onClick = {onClick(searchInfo)})
+                    Spacer(modifier = Modifier.width(30.dp))
+                }
+            }
         }
     }
 }
 
 @Composable
-fun RecentSearchItem(search: String) {
-    Box(modifier = Modifier
-        .padding(6.dp)
-        .background(color = Color(0xFFD7D7D7), shape = RoundedCornerShape(size = 18.dp)),
-        contentAlignment = Alignment.Center
-
+fun RecentSearchItem(searchInfo: SearchInfo, onClick : (SearchInfo)->Unit) {
+    val searchTag = "${searchInfo.department} ${searchInfo.courseCode}"
+    Box(
+        modifier = Modifier
+            .background(color = RecentSearchLabel, shape = RoundedCornerShape(size = 12.dp))
+            .padding(horizontal = 10.dp).padding(vertical = 4.dp).clickable { onClick(searchInfo) },
+        contentAlignment = Alignment.CenterStart
     ) {
-        Text(text = search,
+        Text(
+            text = searchTag,
             style = TextStyle(
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 lineHeight = 30.sp,
-                fontFamily = FontFamily(Font(R.font.lato)),
+                fontFamily = APP_DEFAULT_FONT,
                 fontWeight = FontWeight(800),
-                color = Color(0xFFA4A4A4),
-            ),
-            modifier = Modifier
-                .padding(top = 6.dp, start = 20.dp, end = 20.dp, bottom = 6.dp)
+                color = RecentSearchTextColor,
+            )
         )
     }
 }
 
 @Composable
-fun RecentSearchText(text : String = "Recent search") {
-    Box(Modifier.fillMaxWidth()){
+fun RecentSearchText(text: String = "Recent search") {
+    Box(Modifier.fillMaxWidth()) {
         Text(
             text = text,
             style = TextStyle(
                 fontSize = 18.sp,
                 lineHeight = 30.sp,
-                fontFamily = FontFamily(Font(R.font.lato)),
+                fontFamily = APP_DEFAULT_FONT,
                 fontWeight = FontWeight(800),
                 color = Color(0xFFA4A4A4),
-            ),
-            modifier = Modifier
-                .padding(start = 32.dp, top = 27.dp)
+            )
         )
     }
 }

@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bizarrdev.MyProfessor.screens.MainScreen.Companion.APP_DEFAULT_FONT
+import com.bizarrdev.MyProfessor.ui.theme.APP_DEFAULT_FONT
 import com.bizarrdev.MyProfessor.ui.theme.SearchLoadingTextColor
 
 @Composable

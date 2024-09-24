@@ -100,7 +100,7 @@ private fun ProfessorNameAndReviewCount(professorName: String, ratingData: Profe
                     style = SpanStyle(
                         color = ProfessorReviewCount,
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
                 ) {
                     append("${ratingData.review_num} reviews")

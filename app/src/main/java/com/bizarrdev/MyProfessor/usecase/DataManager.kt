@@ -3,13 +3,25 @@ package com.bizarrdev.MyProfessor.usecase
 import android.content.Context
 import com.bizarrdev.MyProfessor.data.Professor
 import com.bizarrdev.MyProfessor.data.ProfessorRatingData
+import com.bizarrdev.MyProfessor.data.SearchInfo
 import com.bizarrdev.MyProfessor.data.TermData
 
 class DataManager {
     val availableTerms: MutableList<TermData> = mutableListOf()
+    val recentSearch: MutableList<SearchInfo> = mutableListOf()
 
     private val cachedProfessorRatingData:MutableMap<String, ProfessorRatingData> = mutableMapOf()
     private var isSearchProfessorsPending = false
+
+    fun updateMostRecentSearch(searchInfo: SearchInfo){
+        if (recentSearch.contains(searchInfo)){
+            recentSearch.remove(searchInfo)
+        }
+        if (recentSearch.size == 3){
+            recentSearch.removeAt(2)
+        }
+        recentSearch.add(0, searchInfo.copy())
+    }
 
     fun startSearchingProfessors(
         context: Context,
