@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bizarrdev.MyProfessor.R
+import com.bizarrdev.MyProfessor.ui.theme.APP_DEFAULT_FONT
+import com.bizarrdev.MyProfessor.ui.theme.SearchGuideText
 
 @Composable
 fun SearchBoxGuideText() {
@@ -27,9 +29,9 @@ fun SearchBoxGuideText() {
             style = TextStyle(
                 fontSize = 18.sp,
                 lineHeight = 30.sp,
-                fontFamily = FontFamily(Font(R.font.lato)),
+                fontFamily = APP_DEFAULT_FONT,
                 fontWeight = FontWeight(700),
-                color = Color(0xFFA4A4A4)
+                color = SearchGuideText
             ),
             modifier = Modifier
                 .padding(start = 32.dp, bottom = 5.dp)

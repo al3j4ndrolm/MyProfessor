@@ -22,6 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bizarrdev.MyProfessor.data.TermData
 import com.bizarrdev.MyProfessor.ui.theme.APP_DEFAULT_FONT
+import com.bizarrdev.MyProfessor.ui.theme.ButtonSelectedColor
+import com.bizarrdev.MyProfessor.ui.theme.ButtonSelectedTextColor
+import com.bizarrdev.MyProfessor.ui.theme.ButtonUnselectedColor
+import com.bizarrdev.MyProfessor.ui.theme.ButtonUnselectedTextColor
 
 @Composable
 fun TermButtons(termDataList: List<TermData>, termCodeUpdaters: List<()->Unit>, selectedIndex: Int) {
@@ -44,7 +48,8 @@ fun TermButtons(termDataList: List<TermData>, termCodeUpdaters: List<()->Unit>, 
 
 @Composable
 private fun TermButton(onTerm: () -> Unit, termText: String, isSelected: Boolean){
-    val buttonColor = if (isSelected) BUTTON_SELECTED_COLOR else BUTTON_UNSELECTED_COLOR
+    val buttonColor = if (isSelected) ButtonSelectedColor else ButtonUnselectedColor
+    val textColor = if (isSelected) ButtonSelectedTextColor else ButtonUnselectedTextColor
 
     Box(
         modifier = Modifier
@@ -60,18 +65,14 @@ private fun TermButton(onTerm: () -> Unit, termText: String, isSelected: Boolean
             )
             .width(152.dp)
             .height(41.dp)
-
             .clickable(onClick = { onTerm() }), // Make the box behave like a button (clickable),
         contentAlignment = Alignment.Center // Center the text inside the box
     ) {
         Text(
             text = termText,
             fontFamily = APP_DEFAULT_FONT,
-            color = Color.White // Customize text color if needed
+            color = textColor
         )
     }
 
 }
-
-private val BUTTON_SELECTED_COLOR = Color.DarkGray
-private val BUTTON_UNSELECTED_COLOR = Color.LightGray

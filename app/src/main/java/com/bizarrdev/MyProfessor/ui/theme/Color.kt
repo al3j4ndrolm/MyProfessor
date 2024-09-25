@@ -20,9 +20,16 @@ val RatingGreen = Color(0xFF92c772)
 val RatingRed = Color(0xFFd86161)
 val RatingYellow = Color(0xFFffdc62)
 
-val selectObjectGray = Color(0xFF616161)
-
+// --------------Main page--------------------
 val ErrorMessageTextBackground = gray4
+val SearchGuideText = gray4
+val SearchInputTextColorFocused = Color.Black
+val SearchInputTextColorUnfocused = gray4
+
+val ButtonSelectedColor = gray4
+val ButtonUnselectedColor = gray1
+val ButtonSelectedTextColor = Color.White
+val ButtonUnselectedTextColor = gray4
 
 // --------------Result page--------------------
 // Dashboard header
