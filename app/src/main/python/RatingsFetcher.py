@@ -30,8 +30,8 @@ def get_professor_ratings(professor_name: str, department_code: str):
 
 	for teacher_card in teacher_cards:
 		department_from_card = teacher_card.find_all('div', class_=re.compile(r"^CardSchool__Department"))[0].text
-		departments_to_match = departments.get(department_code, [])
-		if department_from_card in departments_to_match or departments_to_match == []:
+		departments_to_match = departments.get(department_code, "")
+		if department_from_card in departments_to_match or departments_to_match in department_from_card:
 			rating_dict = build_rating_dict(teacher_card)
 			return rating_dict
 

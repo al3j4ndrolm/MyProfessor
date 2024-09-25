@@ -1,3 +1,4 @@
 departments = {
-	"MATH" : ["Mathematics", "Mathematics & Statistics"],
+	"MATH" : "Mathematics",
+	"EWRT" : "English",
 }

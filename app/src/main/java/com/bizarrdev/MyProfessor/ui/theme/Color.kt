@@ -21,17 +21,6 @@ val RatingRed = Color(0xFFd86161)
 val RatingYellow = Color(0xFFffdc62)
 
 // --------------Main page--------------------
-val ErrorMessageTextBackground = gray4
-val SearchGuideText = gray4
-val SearchInputTextColorFocused = Color.Black
-val SearchInputTextColorUnfocused = gray4
-
-val ButtonSelectedColor = gray4
-val ButtonUnselectedColor = gray1
-val ButtonSelectedTextColor = Color.White
-val ButtonUnselectedTextColor = gray4
-
-// --------------Result page--------------------
 // Dashboard header
 val DashboardHeaderBackground = gray1
 val DashboardHeaderTextColor = Color.Black
@@ -40,6 +29,19 @@ val DashboardHeaderTextColor = Color.Black
 val ButtonBackgroundColor = gray2
 val SearchIconColorEnabled = gray4
 val SearchIconColorDisabled = gray1
+// Search input field
+val SearchGuideText = gray4
+val SearchInputTextColorFocused = Color.Black
+val SearchInputTextColorUnfocused = gray4
+val ErrorMessageTextBackground = gray4
+
+// Terms buttons
+val ButtonSelectedColor = gray4
+val ButtonUnselectedColor = gray1
+val ButtonSelectedTextColor = Color.White
+val ButtonUnselectedTextColor = gray4
+
+// Recent search
 val RecentSearchLabel = gray1
 val RecentSearchTextColor = gray3
 
@@ -63,6 +65,7 @@ val ScheduleTextColor = Color.Black
 val OneScheduleBlockBackground = gray2
 val ClassLocationLabelBackground = gray3
 val ClassLocationLabelText = Color.White
+val ScheduleClassCodeText = gray4
 
 // Rating Section
 val RatingTextColor = Color.Black

@@ -149,14 +149,16 @@ class MainScreen {
                     onClick = {
                         val parsedInput = parseInputString(searchInput)
                         println(String.format("parsed input: %s", parsedInput))
-                        if (parsedInput != null) {
+                        if (searchInfo.term == null){
+                            onPopErrorMessage("Please wait for loading terms.")
+                        } else if (parsedInput == null) {
+                            onPopErrorMessage("Please use correct course code as example.")
+                        } else {
                             val (searchInput1, searchInput2) = parsedInput
                             searchInfo.department = searchInput1
                             searchInfo.courseCode = searchInput2
                             dataManager.updateMostRecentSearch(searchInfo)
                             onEnterLoadingScreen()
-                        } else {
-                            onPopErrorMessage("Please use correct course code as example.")
                         }
                     },
                     enabled = isReadyToSearch
@@ -293,7 +295,7 @@ class MainScreen {
             )
         } else {
             Text(
-                text = "Fetching terms...",
+                text = "Getting terms from school...",
                 fontFamily = APP_DEFAULT_FONT,
                 color = FetchingTermsTextColor,
                 modifier = Modifier.padding(top = 30.dp)

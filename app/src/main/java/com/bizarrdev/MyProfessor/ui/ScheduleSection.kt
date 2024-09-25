@@ -30,6 +30,7 @@ import com.bizarrdev.MyProfessor.ui.theme.ClassLocationLabelText
 import com.bizarrdev.MyProfessor.ui.theme.OneScheduleBlockBackground
 import com.bizarrdev.MyProfessor.ui.theme.ProfessorCardBackground
 import com.bizarrdev.MyProfessor.ui.theme.ScheduleButtonText
+import com.bizarrdev.MyProfessor.ui.theme.ScheduleClassCodeText
 import com.bizarrdev.MyProfessor.ui.theme.ScheduleTextColor
 
 
@@ -39,7 +40,7 @@ fun ScheduleSection(allSchedules: Map<String, List<String>>) {
 
     ScheduleSectionRowBackground {
         if (showSchedule) {
-            ScheduleCard(onClick = { showSchedule = false }, allSchedules = allSchedules)
+            ScheduleCard(onToggleScheduleCard = { showSchedule = false }, allSchedules = allSchedules)
         } else {
             Text(
                 "Schedule",
@@ -56,30 +57,52 @@ fun ScheduleSection(allSchedules: Map<String, List<String>>) {
 }
 
 @Composable
-fun ScheduleCard(onClick: () -> Unit, allSchedules: Map<String, List<String>>) {
+fun ScheduleCard(onToggleScheduleCard: () -> Unit, allSchedules: Map<String, List<String>>) {
     Box(
         modifier = Modifier
             .clickable(
-                onClick = onClick,
+                onClick = onToggleScheduleCard,
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }),
         contentAlignment = Alignment.CenterStart
     ) {
-        ScheduleContent(allSchedules = allSchedules)
+        ScheduleContent(allSchedules = allSchedules, onToggleScheduleCard = onToggleScheduleCard)
     }
 }
 
 @Composable
-fun ScheduleContent(allSchedules: Map<String, List<String>>) {
+fun ScheduleContent(allSchedules: Map<String, List<String>>, onToggleScheduleCard: () -> Unit) {
     Column {
         for ((code, schedules) in allSchedules) {
+            var showClassCode  by remember { mutableStateOf(false) }
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .padding(horizontal = 3.dp)
                     .background(ProfessorCardBackground, RoundedCornerShape(14.dp))
+                    .clickable(
+                        onClick = {
+                            if (showClassCode) {
+                                onToggleScheduleCard()
+                            }else {
+                                showClassCode = true
+                            }},
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    )
             ) {
-                SchedulesForOneClass(schedules)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SchedulesForOneClass(schedules)
+                    if (showClassCode){
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = code,
+                            fontFamily = APP_DEFAULT_FONT,
+                            color = ScheduleClassCodeText,
+                            fontSize = 14.sp,
+                        )
+                    }
+                }
             }
         }
     }
