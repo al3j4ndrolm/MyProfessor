@@ -13,12 +13,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RatingBall(color: Color, paddingValues: Dp = 4.dp){
+fun RatingBall(color: Color, size: Dp, paddingValues: Dp){
     Box(
         modifier = Modifier
-            .padding(start = paddingValues, end = paddingValues)
-            .width(16.dp)
-            .height(16.dp)
-            .background(color = color, shape = RoundedCornerShape(10.dp))
+            .padding(horizontal = paddingValues)
+            .width(size)
+            .height(size)
+            .background(color = color, shape = RoundedCornerShape(size/2))
     )
 }

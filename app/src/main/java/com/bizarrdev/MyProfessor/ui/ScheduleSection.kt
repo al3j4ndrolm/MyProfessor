@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bizarrdev.MyProfessor.screens.MainScreen.Companion.APP_DEFAULT_FONT
+import com.bizarrdev.MyProfessor.ui.theme.APP_DEFAULT_FONT
 import com.bizarrdev.MyProfessor.ui.theme.ClassLocationLabelBackground
 import com.bizarrdev.MyProfessor.ui.theme.ClassLocationLabelText
 import com.bizarrdev.MyProfessor.ui.theme.OneScheduleBlockBackground

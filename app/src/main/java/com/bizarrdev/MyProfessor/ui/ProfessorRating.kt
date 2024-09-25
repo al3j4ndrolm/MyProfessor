@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bizarrdev.MyProfessor.data.ProfessorRatingData
-import com.bizarrdev.MyProfessor.screens.MainScreen.Companion.APP_DEFAULT_FONT
+import com.bizarrdev.MyProfessor.ui.theme.APP_DEFAULT_FONT
 import com.bizarrdev.MyProfessor.ui.theme.NoRatingsTextColor
 import com.bizarrdev.MyProfessor.ui.theme.RatingGray1
 import com.bizarrdev.MyProfessor.ui.theme.RatingGray2
@@ -58,9 +58,9 @@ fun ProfessorRatingDisplay(ratingData: ProfessorRatingData){
 @Composable
 fun RatingStillFetchingDisplay(){
     Row(verticalAlignment = Alignment.CenterVertically) {
-        RatingBall(color = RatingGray1)
-        RatingBall(color = RatingGray2)
-        RatingBall(color = RatingGray3)
+        RatingBall(size = 16.dp, color = RatingGray1, paddingValues = 4.dp)
+        RatingBall(size = 16.dp, color = RatingGray2, paddingValues = 4.dp)
+        RatingBall(size = 16.dp, color = RatingGray3, paddingValues = 4.dp)
     }
 }
 
@@ -86,7 +86,7 @@ fun RatingBallWithTextDouble(
             else -> if (isDifficulty) RatingGreen else RatingRed
         }
 
-        RatingBall(color = ballColor)
+        RatingBall(size = 16.dp, color = ballColor, paddingValues = 4.dp)
         RatingText(text = "$text: $rating", color = RatingTextColor)
     }
 }
@@ -101,7 +101,7 @@ fun RatingBallWithTextPercentage(text: String, rating: Double = 0.0) {
             else -> RatingRed
         }
 
-        RatingBall(color = ballColor)
+        RatingBall(size = 16.dp, color = ballColor, paddingValues = 4.dp)
         RatingText(
             text = if (rating.toInt() != -1) "$text: ${rating.toInt()}%" else  "N/A",
             color = RatingTextColor)

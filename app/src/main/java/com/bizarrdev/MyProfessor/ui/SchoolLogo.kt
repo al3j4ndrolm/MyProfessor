@@ -11,29 +11,12 @@ import androidx.compose.ui.unit.dp
 import com.bizarrdev.MyProfessor.R
 
 @Composable
-fun DeAnzaCollegeLogo(){
+fun DeAnzaCollegeLogo(scale: Int = 6){
     Image(
         painter = painterResource(R.drawable.dac_logo_black),
         "De Anza College Logo",
         modifier = Modifier
-            .width(140.dp)
-            .height(70.dp)
-            .padding(
-                end = 20.dp
-            )
-    )
-}
-
-@Composable
-fun DeAnzaCollegeLogoBig(){
-    Image(
-        painter = painterResource(R.drawable.dac_logo_black),
-        "De Anza College Logo",
-        modifier = Modifier
-            .width(180.dp)
-            .height(90.dp)
-            .padding(
-                end = 20.dp
-            )
+            .width((scale * 20).dp)
+            .height((scale * 10).dp)
     )
 }
