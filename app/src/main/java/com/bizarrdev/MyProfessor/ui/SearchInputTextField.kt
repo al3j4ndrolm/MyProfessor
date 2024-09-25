@@ -35,6 +35,7 @@ fun SearchInputTextField(onUpdateInputText: (String) -> Unit) {
 
     TextField(
         value = inputText,
+        singleLine = true,
         onValueChange = { newText ->
             if (newText.length <= 10){
                 inputText = newText
