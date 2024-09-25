@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,10 +46,12 @@ import com.bizarrdev.MyProfessor.ui.SearchInputTextField
 import com.bizarrdev.MyProfessor.ui.SearchLoadingScene
 import com.bizarrdev.MyProfessor.ui.TermButtons
 import com.bizarrdev.MyProfessor.ui.theme.APP_DEFAULT_FONT
+import com.bizarrdev.MyProfessor.ui.theme.ErrorMessageTextBackground
 import com.bizarrdev.MyProfessor.ui.theme.FetchingTermsTextColor
 import com.bizarrdev.MyProfessor.ui.theme.NoCourseFoundTextColor
 import com.bizarrdev.MyProfessor.usecase.DataManager
 import com.bizarrdev.MyProfessor.usecase.parseInputString
+import kotlinx.coroutines.delay
 import java.util.stream.Collectors.toList
 
 class MainScreen {
@@ -55,43 +59,75 @@ class MainScreen {
     private var professors: List<Professor> = listOf()
     private var searchInput: String = ""
     private var searchInfo: SearchInfo = SearchInfo()
+    private var errorMessage: String = ""
 
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun Launch(context: Context) {
         var screenSection: ScreenSection by remember { mutableStateOf(SEARCH_INPUT) }
+        var showMessage by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxSize().background(Color.White)){
             when (screenSection) {
                 SEARCH_INPUT -> SearchInputScreen(
                     context = context,
-                    onEnterLoadingScreen = {
-                        screenSection = SEARCH_LOADING
+                    onEnterLoadingScreen = { screenSection = SEARCH_LOADING },
+                    onPopErrorMessage = {
+                        errorMessage = it
+                        showMessage = true
                     }
                 )
 
                 SEARCH_LOADING -> SearchLoadingScreen(
                     context = context,
-                    onEnterResultScreen = {
-                        screenSection = SEARCH_RESULT
-                    },
+                    onEnterResultScreen = { screenSection = SEARCH_RESULT },
                     onBackToSearchScreen = {
+                        searchInput = ""
                         screenSection = SEARCH_INPUT
                     }
                 )
 
                 SEARCH_RESULT -> ResultScreen(
                     onBackToSearchScreen = {
+                        searchInput = ""
                         screenSection = SEARCH_INPUT
                     }
                 )
             }
+            if (showMessage) {
+                ErrorMessage(errorMessage) {
+                    showMessage = false
+                    errorMessage = ""
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun ErrorMessage(errorMessage: String, onTimeout: () -> Unit){
+        LaunchedEffect(Unit) {
+            delay(2000) // Wait for 2 seconds
+            onTimeout() // Hide the text field after 2 seconds
+        }
+
+        Box(modifier = Modifier.fillMaxSize().padding(bottom = 40.dp),
+            contentAlignment = Alignment.Center){
+            // Text field or any content you want to show temporarily
+            Text(
+                text = errorMessage,
+                modifier = Modifier.background(ErrorMessageTextBackground, shape = RoundedCornerShape(4.dp)).padding(horizontal = 16.dp, vertical = 4.dp),
+                color = Color.White,
+                fontSize = 12.sp,
+            )
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
-    fun SearchInputScreen(context: Context, onEnterLoadingScreen: () -> Unit) {
+    fun SearchInputScreen(
+        context: Context,
+        onEnterLoadingScreen: () -> Unit,
+        onPopErrorMessage: (String) -> Unit) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -120,7 +156,7 @@ class MainScreen {
                             dataManager.updateMostRecentSearch(searchInfo)
                             onEnterLoadingScreen()
                         } else {
-                            // Error handle
+                            onPopErrorMessage("Please use correct course code as example.")
                         }
                     },
                     enabled = isReadyToSearch

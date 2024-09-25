@@ -1,6 +1,7 @@
 package com.bizarrdev.MyProfessor.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,14 +35,12 @@ import com.bizarrdev.MyProfessor.usecase.DataManager
 fun RecentSearchRow(recentSearch: List<SearchInfo>, onClick: (SearchInfo) -> Unit) {
     if (recentSearch.isNotEmpty()) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally) {
+            horizontalAlignment = Alignment.Start) {
             RecentSearchText()
 
-            Row(Modifier.fillMaxWidth().padding(top = 10.dp)) {
-                for (searchInfo in recentSearch) {
-                    RecentSearchItem(searchInfo = searchInfo, onClick = {onClick(searchInfo)})
-                    Spacer(modifier = Modifier.width(30.dp))
-                }
+            for (searchInfo in recentSearch) {
+                Spacer(modifier = Modifier.height(12.dp))
+                RecentSearchItem(searchInfo = searchInfo, onClick = {onClick(searchInfo)})
             }
         }
     }
@@ -48,17 +48,18 @@ fun RecentSearchRow(recentSearch: List<SearchInfo>, onClick: (SearchInfo) -> Uni
 
 @Composable
 fun RecentSearchItem(searchInfo: SearchInfo, onClick : (SearchInfo)->Unit) {
-    val searchTag = "${searchInfo.department} ${searchInfo.courseCode}"
+    val searchTag = "${searchInfo.department} ${searchInfo.courseCode}    ${searchInfo.term!!.termText}"
     Box(
         modifier = Modifier
-            .background(color = RecentSearchLabel, shape = RoundedCornerShape(size = 12.dp))
+//            .background(color = RecentSearchLabel, shape = RoundedCornerShape(size = 12.dp))
+            .border(width = 1.dp, color = RecentSearchLabel, shape = RoundedCornerShape(size = 12.dp))
             .padding(horizontal = 10.dp).padding(vertical = 4.dp).clickable { onClick(searchInfo) },
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
             text = searchTag,
             style = TextStyle(
-                fontSize = 14.sp,
+                fontSize = 16.sp,
                 lineHeight = 30.sp,
                 fontFamily = APP_DEFAULT_FONT,
                 fontWeight = FontWeight(800),

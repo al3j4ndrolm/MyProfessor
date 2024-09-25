@@ -22,6 +22,8 @@ val RatingYellow = Color(0xFFffdc62)
 
 val selectObjectGray = Color(0xFF616161)
 
+val ErrorMessageTextBackground = gray4
+
 // --------------Result page--------------------
 // Dashboard header
 val DashboardHeaderBackground = gray1
