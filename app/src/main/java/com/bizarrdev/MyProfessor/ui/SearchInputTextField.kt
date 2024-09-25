@@ -27,6 +27,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bizarrdev.MyProfessor.R
+import com.bizarrdev.MyProfessor.ui.theme.SearchInputTextColorFocused
+import com.bizarrdev.MyProfessor.ui.theme.SearchInputTextColorUnfocused
 
 @Composable
 fun SearchInputTextField(onUpdateInputText: (String) -> Unit) {
@@ -57,8 +59,8 @@ fun SearchInputTextField(onUpdateInputText: (String) -> Unit) {
         },
         shape = RoundedCornerShape(32.dp),
         colors = TextFieldDefaults.colors(
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Gray,
+            focusedTextColor = SearchInputTextColorFocused,
+            unfocusedTextColor = SearchInputTextColorUnfocused,
             focusedContainerColor = Color(0xFFE8E8E8),
             unfocusedContainerColor = Color(0xFFE8E8E8),
             disabledContainerColor = Color.LightGray,
