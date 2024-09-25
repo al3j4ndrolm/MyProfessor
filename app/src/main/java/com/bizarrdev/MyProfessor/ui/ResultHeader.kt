@@ -66,7 +66,9 @@ fun ResultHeaderContentLeftSide(
     onClickBackButton: () -> Unit = {}
 ) {
     Column(
-        modifier = Modifier.padding(start = 10.dp).padding(top = 32.dp)
+        modifier = Modifier
+            .padding(start = 10.dp)
+            .padding(top = 32.dp)
     ) {
         Row(
             modifier = Modifier.width(100.dp),
@@ -79,7 +81,8 @@ fun ResultHeaderContentLeftSide(
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(bottom = 5.dp).padding(start = 1.dp),
+                .padding(bottom = 5.dp)
+                .padding(start = 1.dp),
             contentAlignment = Alignment.BottomStart
         ) {
             ResultHeaderText(searchInfo)

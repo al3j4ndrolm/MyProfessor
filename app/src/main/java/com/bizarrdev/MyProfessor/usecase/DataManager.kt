@@ -5,6 +5,7 @@ import com.bizarrdev.MyProfessor.data.Professor
 import com.bizarrdev.MyProfessor.data.ProfessorRatingData
 import com.bizarrdev.MyProfessor.data.SearchInfo
 import com.bizarrdev.MyProfessor.data.TermData
+import com.bizarrdev.MyProfessor.ui.theme.MOST_RECENT_SEARCH_LIMIT
 
 class DataManager {
     val availableTerms: MutableList<TermData> = mutableListOf()
@@ -17,8 +18,8 @@ class DataManager {
         if (recentSearch.contains(searchInfo)){
             recentSearch.remove(searchInfo)
         }
-        if (recentSearch.size == 3){
-            recentSearch.removeAt(2)
+        if (recentSearch.size == MOST_RECENT_SEARCH_LIMIT){
+            recentSearch.removeLast()
         }
         recentSearch.add(0, searchInfo.copy())
     }
