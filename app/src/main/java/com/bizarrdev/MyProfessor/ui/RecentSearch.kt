@@ -51,7 +51,6 @@ fun RecentSearchItem(searchInfo: SearchInfo, onClick : (SearchInfo)->Unit) {
     val searchTag = "${searchInfo.department} ${searchInfo.courseCode}    ${searchInfo.term!!.termText}"
     Box(
         modifier = Modifier
-//            .background(color = RecentSearchLabel, shape = RoundedCornerShape(size = 12.dp))
             .border(width = 1.dp, color = RecentSearchLabel, shape = RoundedCornerShape(size = 12.dp))
             .padding(horizontal = 10.dp).padding(vertical = 4.dp).clickable { onClick(searchInfo) },
         contentAlignment = Alignment.CenterStart

@@ -67,9 +67,9 @@ fun RatingStillFetchingDisplay(){
 @Composable
 fun RatingBallsAndTexts(rating: Double = 0.0, difficulty: Double = 0.0, recommend: Double = 0.0) {
     Row(modifier = Modifier) {
-        RatingBallWithTextDouble("Difficulty", difficulty, isDifficulty = true)
-        RatingBallWithTextPercentage("Recommend", recommend)
         RatingBallWithTextDouble("Rating", rating)
+        RatingBallWithTextPercentage("Recommend", recommend)
+        RatingBallWithTextDouble("Difficulty", difficulty, isDifficulty = true)
     }
 }
 
@@ -81,8 +81,8 @@ fun RatingBallWithTextDouble(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         val ballColor = when {
-            rating > 4.0 -> if (isDifficulty) RatingRed else RatingGreen
-            rating > 3.0 -> if (isDifficulty) RatingYellow else RatingYellow
+            rating >= 4.0 -> if (isDifficulty) RatingRed else RatingGreen
+            rating >= 3.0 -> RatingYellow
             else -> if (isDifficulty) RatingGreen else RatingRed
         }
 
