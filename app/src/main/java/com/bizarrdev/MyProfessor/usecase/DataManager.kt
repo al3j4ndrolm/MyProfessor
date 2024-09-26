@@ -1,18 +1,26 @@
 package com.bizarrdev.MyProfessor.usecase
 
 import android.content.Context
+import android.util.Log
 import com.bizarrdev.MyProfessor.data.Professor
 import com.bizarrdev.MyProfessor.data.ProfessorRatingData
 import com.bizarrdev.MyProfessor.data.SearchInfo
 import com.bizarrdev.MyProfessor.data.TermData
 import com.bizarrdev.MyProfessor.ui.theme.MOST_RECENT_SEARCH_LIMIT
 
-class DataManager {
-    val availableTerms: MutableList<TermData> = mutableListOf()
+class DataManager(
     val recentSearch: MutableList<SearchInfo> = mutableListOf()
+) {
+    val availableTerms: MutableList<TermData> = mutableListOf()
 
     private val cachedProfessorRatingData:MutableMap<String, ProfessorRatingData> = mutableMapOf()
     private var isSearchProfessorsPending = false
+
+    fun loadMostRecentSearch(searchInfos : List<SearchInfo>){
+        Log.d("DataManager", "Loading recent search info from storage.")
+        recentSearch.clear()
+        recentSearch.addAll(searchInfos)
+    }
 
     fun updateMostRecentSearch(searchInfo: SearchInfo){
         if (recentSearch.contains(searchInfo)){
