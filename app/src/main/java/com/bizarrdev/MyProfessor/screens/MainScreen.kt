@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,11 +49,13 @@ import com.bizarrdev.MyProfessor.ui.theme.ErrorMessageTextBackground
 import com.bizarrdev.MyProfessor.ui.theme.FetchingTermsTextColor
 import com.bizarrdev.MyProfessor.ui.theme.NoCourseFoundTextColor
 import com.bizarrdev.MyProfessor.usecase.DataManager
+import com.bizarrdev.MyProfessor.usecase.DataStorageManager
 import com.bizarrdev.MyProfessor.usecase.parseInputString
 import kotlinx.coroutines.delay
 import java.util.stream.Collectors.toList
 
 class MainScreen {
+    private val dataStorageManager: DataStorageManager = DataStorageManager()
     private val dataManager: DataManager = DataManager()
     private var professors: List<Professor> = listOf()
     private var searchInput: String = ""
@@ -64,6 +65,8 @@ class MainScreen {
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun Launch(context: Context) {
+        dataManager.loadMostRecentSearch(dataStorageManager.readRecentSearchData(context))
+
         var screenSection: ScreenSection by remember { mutableStateOf(SEARCH_INPUT) }
         var showMessage by remember { mutableStateOf(false) }
 
@@ -158,6 +161,7 @@ class MainScreen {
                             searchInfo.department = searchInput1
                             searchInfo.courseCode = searchInput2
                             dataManager.updateMostRecentSearch(searchInfo)
+                            dataStorageManager.saveRecentSearchData(context, dataManager.recentSearch)
                             onEnterLoadingScreen()
                         }
                     },
@@ -183,6 +187,7 @@ class MainScreen {
                 onClick = {
                     searchInfo = it.copy()
                     dataManager.updateMostRecentSearch(searchInfo)
+                    dataStorageManager.saveRecentSearchData(context, dataManager.recentSearch)
                     onEnterLoadingScreen()
                 })
         }
