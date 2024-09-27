@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bizarrdev.MyProfessor.data.Professor
@@ -37,7 +38,7 @@ import com.bizarrdev.MyProfessor.data.SearchInfo
 import com.bizarrdev.MyProfessor.data.TermData
 import com.bizarrdev.MyProfessor.ui.DashboardHeadedAndSchoolLogo
 import com.bizarrdev.MyProfessor.ui.FadeoutCover
-import com.bizarrdev.MyProfessor.ui.RecentSearchRow
+import com.bizarrdev.MyProfessor.ui.RecentSearchSection
 import com.bizarrdev.MyProfessor.ui.ResultHeader
 import com.bizarrdev.MyProfessor.ui.SearchBoxGuideText
 import com.bizarrdev.MyProfessor.ui.SearchButton
@@ -54,9 +55,9 @@ import com.bizarrdev.MyProfessor.usecase.parseInputString
 import kotlinx.coroutines.delay
 import java.util.stream.Collectors.toList
 
-class MainScreen {
+class MainScreen(val context: Context) {
     private val dataStorageManager: DataStorageManager = DataStorageManager()
-    private val dataManager: DataManager = DataManager()
+    private val dataManager: DataManager = DataManager(context)
     private var professors: List<Professor> = listOf()
     private var searchInput: String = ""
     private var searchInfo: SearchInfo = SearchInfo()
@@ -64,7 +65,7 @@ class MainScreen {
 
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
-    fun Launch(context: Context) {
+    fun Launch() {
         dataManager.loadMostRecentSearch(dataStorageManager.readRecentSearchData(context))
 
         var screenSection: ScreenSection by remember { mutableStateOf(SEARCH_INPUT) }
@@ -73,7 +74,6 @@ class MainScreen {
         Box(modifier = Modifier.fillMaxSize().background(Color.White)){
             when (screenSection) {
                 SEARCH_INPUT -> SearchInputScreen(
-                    context = context,
                     onEnterLoadingScreen = { screenSection = SEARCH_LOADING },
                     onPopErrorMessage = {
                         errorMessage = it
@@ -82,7 +82,6 @@ class MainScreen {
                 )
 
                 SEARCH_LOADING -> SearchLoadingScreen(
-                    context = context,
                     onEnterResultScreen = { screenSection = SEARCH_RESULT },
                     onBackToSearchScreen = {
                         searchInput = ""
@@ -128,9 +127,9 @@ class MainScreen {
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
     fun SearchInputScreen(
-        context: Context,
         onEnterLoadingScreen: () -> Unit,
-        onPopErrorMessage: (String) -> Unit) {
+        onPopErrorMessage: (String) -> Unit
+    ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -169,20 +168,14 @@ class MainScreen {
                 )
             }
 
-            Box(
-                Modifier
-                    .fillMaxWidth(), contentAlignment = Alignment.Center
-            ) {
-                TermOptionsRow(
-                    context = context,
-                    updateChosenTerm = {
-                        searchInfo.term = it
-                        isReadyToSearch = searchInput.isNotBlank()
-                    },
-                )
-            }
+            TermOptionsRow(
+                updateChosenTerm = {
+                    searchInfo.term = it
+                    isReadyToSearch = searchInput.isNotBlank()
+                },
+            )
 
-            RecentSearchRow(
+            RecentSearchSection(
                 recentSearch = dataManager.recentSearch,
                 onClick = {
                     searchInfo = it.copy()
@@ -195,16 +188,12 @@ class MainScreen {
 
     @Composable
     fun SearchLoadingScreen(
-        context: Context,
         onEnterResultScreen: () -> Unit,
         onBackToSearchScreen: () -> Unit
     ) {
         LaunchedEffect(Unit) {
             dataManager.startSearchingProfessors(
-                context = context,
-                department = searchInfo.department,
-                courseCode = searchInfo.courseCode,
-                term = searchInfo.term!!.termCode,
+                searchInfo = searchInfo,
                 onResultReceived = {
                     professors = it
                     onEnterResultScreen()
@@ -264,7 +253,7 @@ class MainScreen {
     }
 
     @Composable
-    private fun TermOptionsRow(context: Context, updateChosenTerm: (TermData) -> Unit) {
+    private fun TermOptionsRow(updateChosenTerm: (TermData) -> Unit) {
         if (dataManager.availableTerms.isNotEmpty()) {
             val availableTerms = dataManager.availableTerms
             TermButtons(
@@ -303,7 +292,8 @@ class MainScreen {
                 text = "Getting terms from school...",
                 fontFamily = APP_DEFAULT_FONT,
                 color = FetchingTermsTextColor,
-                modifier = Modifier.padding(top = 30.dp)
+                modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
+                textAlign = TextAlign.Center
             )
         }
     }

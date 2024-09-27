@@ -9,10 +9,12 @@ import com.bizarrdev.MyProfessor.data.TermData
 import com.bizarrdev.MyProfessor.ui.theme.MOST_RECENT_SEARCH_LIMIT
 
 class DataManager(
-    val recentSearch: MutableList<SearchInfo> = mutableListOf()
+    val context: Context
 ) {
+    val recentSearch: MutableList<SearchInfo> = mutableListOf()
     val availableTerms: MutableList<TermData> = mutableListOf()
 
+    private val cachedProfessors :MutableMap<SearchInfo, List<Professor>> = mutableMapOf()
     private val cachedProfessorRatingData:MutableMap<String, ProfessorRatingData> = mutableMapOf()
     private var isSearchProfessorsPending = false
 
@@ -33,33 +35,28 @@ class DataManager(
     }
 
     fun startSearchingProfessors(
-        context: Context,
-        department: String,
-        courseCode: String,
-        term: String,
+        searchInfo: SearchInfo,
         onResultReceived: (List<Professor>) -> Unit,
     ) {
-        val startTimestamp = System.currentTimeMillis()
+        if (cachedProfessors.containsKey(searchInfo)){
+            cachedProfessors[searchInfo]?.let { onResultReceived(it) }
+            return
+        }
+
+        val startTime = System.currentTimeMillis()
         isSearchProfessorsPending = true
 
         searchProfessors(
             context = context,
-            department = department,
-            courseCode = courseCode,
-            term = term,
+            department = searchInfo.department,
+            courseCode = searchInfo.courseCode,
+            term = searchInfo.term!!.termCode,
             onResultReceived = {
                 if (isSearchProfessorsPending){
                     isSearchProfessorsPending = false
-                    println(
-                        String.format(
-                            "Completed professors fetching in %s seconds.",
-                            getDurationInSeconds(startTimestamp)
-                        )
-                    )
+                    log("Completed schedules fetching in ${getLatency(startTime)} seconds.")
                     val professors = it.data as List<Professor>
-                    if (it.errorMessage.isBlank()){
-
-                    }
+                    cachedProfessors[searchInfo] = professors
                     onResultReceived(professors)
                 }
             })
@@ -75,17 +72,12 @@ class DataManager(
             return
         }
 
-        val startTimestamp = System.currentTimeMillis()
+        val startTime = System.currentTimeMillis()
 
         searchAvailableTerms(
             context = context,
             onResultReceived = {
-                println(
-                    String.format(
-                        "Completed terms fetching in %s seconds.",
-                        getDurationInSeconds(startTimestamp)
-                    )
-                )
+                log("Completed terms fetching in ${getLatency(startTime)} seconds.")
                 availableTerms.addAll(it)
                 onResultReceived(it)
             })
@@ -107,16 +99,20 @@ class DataManager(
             professorName = professorName,
             department = department,
             onResultReceived = {
-                val ratingData = it.data as ProfessorRatingData
                 if (it.errorMessage.isBlank()){
+                    val ratingData = it.data as ProfessorRatingData
                     cachedProfessorRatingData[professorName] = ratingData
+                    onResultReceived(ratingData)
                 }
-                onResultReceived(ratingData)
             })
     }
 
     companion object {
-         fun getDurationInSeconds(startTimestamp: Long) =
+        fun getLatency(startTimestamp: Long) =
             (System.currentTimeMillis() - startTimestamp).toDouble() / 1000.0
+
+        fun log(message: String) {
+            Log.d("DataManager", message)
+        }
     }
 }
