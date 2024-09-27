@@ -8,12 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.bizarrdev.MyProfessor.data.SearchInfo
-import com.bizarrdev.MyProfessor.data.TermData
 import com.bizarrdev.MyProfessor.screens.MainScreen
-import com.bizarrdev.MyProfessor.ui.RecentSearchRow
-import com.bizarrdev.MyProfessor.ui.ResultHeader
-import com.bizarrdev.MyProfessor.ui.ScheduleContent
 import com.bizarrdev.MyProfessor.ui.theme.MyProfessorTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,7 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyProfessorTheme {
-                MainScreen().Launch(this.applicationContext)
+                MainScreen(this.applicationContext).Launch()
             }
         }
     }

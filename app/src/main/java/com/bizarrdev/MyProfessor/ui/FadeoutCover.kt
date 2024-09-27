@@ -15,12 +15,12 @@ fun FadeoutCover(){
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(25.dp) // Height of the fading box at the top
+            .height(20.dp) // Height of the fading box at the top
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
                         Color.White, // Fade color
-                        Color.White.copy(0.8f), // Fade color
+                        Color.White.copy(0.6f), // Fade color
                         Color.Transparent // Transparent bottom
                     )
                 )
