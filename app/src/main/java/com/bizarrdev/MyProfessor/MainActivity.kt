@@ -8,7 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.bizarrdev.MyProfessor.data.ScreenSection.SEARCH_LOADING
+import com.bizarrdev.MyProfessor.data.TermData
 import com.bizarrdev.MyProfessor.screens.MainScreen
+import com.bizarrdev.MyProfessor.ui.TermButtons
 import com.bizarrdev.MyProfessor.ui.theme.MyProfessorTheme
 
 class MainActivity : ComponentActivity() {
@@ -29,6 +32,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     MyProfessorTheme {
+        TermButtons(
+            termDataList = listOf(
+                TermData(termCode = "W2024", termText = "Winter 2025"),
+                TermData(termCode = "F2024", termText = "Fall 2024"),
+            ),
+            termCodeUpdaters = listOf(),
+            selectedIndex = 0,
+        )
 //        DashboardHeadedAndSchoolLogo()
 //        val searchInfo = SearchInfo(
 //            department = "MATH",

@@ -1,25 +1,38 @@
 import HttpUtil
+from AdditionalConfigs import WINTER_TERM_2025, SUMMER_TERM_2024
 
 ######################## Exported to be used in kotlin ########################
 
 def get_terms():
+	terms_fetched = get_terms_internal()
+
+	if WINTER_TERM_2025 not in terms_fetched:
+		terms_fetched.insert(0, WINTER_TERM_2025)
+		terms_fetched.remove(SUMMER_TERM_2024)
+
+	return terms_fetched
+
+def get_terms_internal():
 	print(f"ProfessorsFetcher: Received call get_terms().")
-	soup = HttpUtil.get_soup(url = 'https://www.deanza.edu/schedule/')
-	sections = soup.find_all('fieldset')
-	if len(sections) == 0:
+	try:
+		soup = HttpUtil.get_soup(url = 'https://www.deanza.edu/schedule/')
+		sections = soup.find_all('fieldset')
+		if len(sections) == 0:
+			return []
+		buttons = sections[0].find_all('button')
+
+		terms = []
+		for button in buttons:
+			if "btn-term" in button.get('class'):
+				terms.append({
+					"term_code":button.get('value'),
+					"term_text":button.text,
+					})
+
+		print(f"ProfessorsFetcher: Returning term data of get_terms() to client.")
+		return terms
+	except:
 		return []
-	buttons = sections[0].find_all('button')
-
-	terms = []
-	for button in buttons:
-		if "btn-term" in button.get('class'):
-			terms.append({
-				"term_code":button.get('value'),
-				"term_text":button.text,
-				})
-
-	print(f"ProfessorsFetcher: Returning term data of get_terms() to client.")
-	return terms
 
 def get_professors_data(department_code, coruse_code, term_code):
 	print(f"ProfessorsFetcher: Received call get_professors_data({department_code}, {coruse_code}, {term_code}).")
@@ -116,6 +129,6 @@ def get_days(input):
 	return input.replace("·", "")
 
 if __name__ == "__main__":
-	print(get_professors_data(department_code = "MATH", coruse_code = "1A", term_code = "F2024"))
+	# print(get_professors_data(department_code = "MATH", coruse_code = "1A", term_code = "F2024"))
 	# print(get_professors_data(department_code = "PHYS", coruse_code = "2A", term_code = "F2024"))
-	# print(get_terms())
+	print(get_terms())
